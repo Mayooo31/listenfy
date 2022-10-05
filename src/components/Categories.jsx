@@ -45,6 +45,11 @@ const Categories = () => {
       return;
     }
 
+    if (categoryName.length === 5) {
+      setSelectedCategory(lastState => lastState.slice(0, -1));
+      setCategoryName(lastState => lastState.slice(0, -1));
+    }
+
     categoryName.length === 0 && setCategoryName([name]);
     categoryName.length !== 0 && setCategoryName(lastState => [name, ...lastState]);
 
