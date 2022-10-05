@@ -1,16 +1,13 @@
-import { PlayIcon } from "@heroicons/react/24/solid";
 import React, { useEffect, useState } from "react";
 import { useCtx } from "../context/context";
+
+import { PlayIcon } from "@heroicons/react/24/solid";
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [categoryName, setCategoryName] = useState([]);
-  const { userLoggedToken } = useCtx([]);
-
-  // console.log(categories);
-  // console.log(selectedCategory);
-  // console.log(categoryName);
+  const { userLoggedToken } = useCtx();
 
   const fetchCategories = async () => {
     const res = await fetch(
@@ -29,9 +26,9 @@ const Categories = () => {
   };
 
   const selectCategory = async (id, name) => {
-    if (categoryName.find(catName => catName.toLowerCase() === name.toLowerCase())) {
+    if (categoryName.find(catName => catName.id.toLowerCase() === id.toLowerCase())) {
       const filteredCategoryName = categoryName.filter(
-        catName => catName.toLowerCase() !== name.toLowerCase()
+        catName => catName.id.toLowerCase() !== id.toLowerCase()
       );
       setCategoryName(filteredCategoryName);
 
@@ -50,8 +47,9 @@ const Categories = () => {
       setCategoryName(lastState => lastState.slice(0, -1));
     }
 
-    categoryName.length === 0 && setCategoryName([name]);
-    categoryName.length !== 0 && setCategoryName(lastState => [name, ...lastState]);
+    categoryName.length === 0 && setCategoryName([{ name, id }]);
+    categoryName.length !== 0 &&
+      setCategoryName(lastState => [{ name, id }, ...lastState]);
 
     const res = await fetch(
       `https://api.spotify.com/v1/browse/categories/${id}/playlists?limit=50&offset=0`,
@@ -79,7 +77,7 @@ const Categories = () => {
       <div className="flex flex-col gap-2">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-medium">Categories</h1>
-          <div className="flex gap-3 items-center">
+          <div className="flex gap-5 items-center">
             <button
               onClick={() => {
                 setSelectedCategory([]);
@@ -94,21 +92,21 @@ const Categories = () => {
         </div>
         <div className="flex justify-start gap-3 flex-wrap max-h-[200px] overflow-auto">
           {categories.map(category => (
-            <p
+            <button
               onClick={() => {
                 selectCategory(category.id, category.name);
               }}
               key={category.id}
               className={`${
                 categoryName.find(
-                  catName => catName.toLowerCase() === category.name.toLowerCase()
+                  catName => catName.id.toLowerCase() === category.id.toLowerCase()
                 )
                   ? "bg-[#669fd8] text-white"
                   : "bg-secondary text-blackish"
               } text-center flex-1 font-medium p-2 rounded-xl whitespace-nowrap cursor-pointer hover:bg-[#8ab2d7] hover:text-white`}
             >
               {category.name}
-            </p>
+            </button>
           ))}
         </div>
       </div>
@@ -121,7 +119,7 @@ const Categories = () => {
 
       {selectedCategory.map((cat, index) => (
         <div key={cat.href} className="flex flex-col gap-2">
-          <h1 className="text-2xl font-medium">{categoryName[index]}</h1>
+          <h1 className="text-2xl font-medium">{categoryName[index].name}</h1>
           <div className="flex gap-5 h-[155px] md:h-[187px] overflow-x-auto bb">
             {cat.items &&
               cat.items.map(category => {
@@ -149,14 +147,14 @@ const Categories = () => {
           </div>
         </div>
       ))}
+
+      {selectedCategory.length !== 0 && (
+        <h1 className="flex justify-center text-center pt-5 pb-10 text-lg ss:text-2xl">
+          - selected categories {categoryName.length} of 5 -
+        </h1>
+      )}
     </div>
   );
 };
 
 export default Categories;
-
-// className={`${categoryName.map(catName =>
-//   catName.toLowerCase() === category.name.toLowerCase()
-//     ? "bg-[#669fd8] text-white"
-//     : "bg-secondary text-blackish"
-// )} text-center flex-1 font-medium p-2 rounded-xl whitespace-nowrap cursor-pointer hover:bg-[#8ab2d7] hover:text-white`}

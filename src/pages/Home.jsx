@@ -81,16 +81,3 @@ const Home = ({ openPanel, setOpenPanel }) => {
 };
 
 export default Home;
-
-// const getLikedSongs = async id => {
-//   const res = await fetch(`https://api.spotify.com/v1/me/tracks?limit=50&offset=0`, {
-//     method: "GET",
-//     headers: {
-//       Authorization: "Bearer " + id,
-//       "Content-Type": "application/json",
-//     },
-//   });
-//   const data = await res.json();
-
-//   // console.log(data);
-// };
