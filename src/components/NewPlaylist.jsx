@@ -1,8 +1,6 @@
 import React, { useRef, useState } from "react";
 import { useCtx } from "../context/context";
 
-import likedImage from "../assets/planet-2.png";
-
 const NewPlaylist = () => {
   const [isPublic, setIsPublic] = useState(false);
   const [error, setError] = useState(undefined);

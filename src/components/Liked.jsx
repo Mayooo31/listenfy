@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useCtx } from "../context/context";
 
 import convertDate from "../utils/convertDate";
@@ -6,8 +6,11 @@ import convertTime from "../utils/convertTime";
 
 import { PlayIcon } from "@heroicons/react/24/solid";
 import likedImage from "../assets/liked.png";
+import GoToTop from "./GoToTop";
 
 const Liked = () => {
+  const sectionRef = useRef();
+  const [showGoToTop, setShowGoToTop] = useState(false);
   const [liked, setLiked] = useState([]);
   const { userLoggedToken, userInfo } = useCtx();
 
@@ -41,12 +44,25 @@ const Liked = () => {
     setLiked(data);
   };
 
+  const wheelHandler = () => {
+    if (sectionRef.current.scrollTop < 700) return setShowGoToTop(false);
+    setShowGoToTop(true);
+  };
+
+  const GoToTopHandler = () => {
+    sectionRef.current.scrollTop = 0;
+  };
+
   useEffect(() => {
     getLikedSongs();
   }, []);
 
   return (
-    <section className="fixed flex flex-col gap-5 top-24 bottom-36 left-0 right-0 m-2 mb-4 rounded-2xl md:left-80 md:ml-4 text-grayish bg-[#222] p-4 overflow-y-auto bb">
+    <section
+      onScroll={wheelHandler}
+      ref={sectionRef}
+      className="fixed flex flex-col gap-5 top-24 bottom-36 left-0 right-0 m-2 mb-4 rounded-2xl md:left-80 md:ml-4 text-grayish bg-[#222] p-4 scroll-smooth overflow-y-auto bb"
+    >
       <div className="flex flex-col gap-2">
         <div className="flex justify-around sm:gap-5 sm:justify-start w-[100%] items-center border-b-2 border-solid border-[#dedede] pb-3">
           <img
@@ -163,6 +179,7 @@ const Liked = () => {
           </button>
         )}
       </div>
+      {showGoToTop && <GoToTop click={GoToTopHandler} />}
     </section>
   );
 };

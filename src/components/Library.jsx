@@ -1,7 +1,6 @@
 import React from "react";
 import { useCtx } from "../context/context";
 
-import planet from "../assets/planet-2.png";
 import { PlayIcon } from "@heroicons/react/24/solid";
 
 const Library = () => {
@@ -16,7 +15,7 @@ const Library = () => {
             <div key={playlist.id} className="w-28 md:w-36 cursor-pointer group">
               <div className="relative h-28 md:h-36 w-full">
                 <img
-                  src={!playlist.images[0]?.url ? planet : playlist.images[0]?.url}
+                  src={playlist.images[0]?.url && playlist.images[0]?.url}
                   className="h-full w-full object-cover rounded-md"
                 />
                 <PlayIcon className="absolute h-10 w-10 right-1 bottom-1 text-white md:hidden md:group-hover:block hover:text-green-500 cursor-default" />

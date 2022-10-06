@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useCtx } from "../context/context";
 
 import convertDate from "../utils/convertDate";
@@ -6,13 +6,17 @@ import convertTime from "../utils/convertTime";
 
 import { PlayIcon } from "@heroicons/react/24/solid";
 import likedImage from "../assets/liked.png";
+import GoToTop from "./GoToTop";
 
 const Playlist = () => {
+  const sectionRef = useRef();
   const [reRender, setReRender] = useState(true);
-  const [selectedPlaylist, setSelectedPlaylist] = useState([]);
-  const { userLoggedToken, userInfo, selectedPlaylistId } = useCtx();
-
-  console.log(selectedPlaylist);
+  const [showGoToTop, setShowGoToTop] = useState(false);
+  const [selectedPlaylist, setSelectedPlaylist] = useState({
+    owner: { display_name: "AO" },
+    images: { 0: { url: likedImage } },
+  });
+  const { userLoggedToken, selectedPlaylistId } = useCtx();
 
   const getPlaylist = async () => {
     const res = await fetch(
@@ -28,6 +32,7 @@ const Playlist = () => {
     const data = await res.json();
 
     setSelectedPlaylist(data);
+    sectionRef.current.scrollTop = 0;
   };
 
   const getNextSongs = async offset => {
@@ -51,29 +56,46 @@ const Playlist = () => {
     setReRender(!reRender);
   };
 
+  const wheelHandler = () => {
+    if (sectionRef.current.scrollTop < 700) return setShowGoToTop(false);
+    setShowGoToTop(true);
+  };
+
+  const GoToTopHandler = () => {
+    sectionRef.current.scrollTop = 0;
+  };
+
   useEffect(() => {
     getPlaylist();
   }, [selectedPlaylistId]);
 
   return (
-    <section className="fixed flex flex-col gap-5 top-24 bottom-36 left-0 right-0 m-2 mb-4 rounded-2xl md:left-80 md:ml-4 text-grayish bg-[#222] p-4 overflow-y-auto bb">
+    <section
+      onScroll={wheelHandler}
+      ref={sectionRef}
+      className="fixed flex flex-col gap-5 top-24 bottom-36 left-0 right-0 m-2 mb-4 rounded-2xl md:left-80 md:ml-4 text-grayish bg-[#222] p-4 scroll-smooth overflow-y-auto bb"
+    >
       <div className="flex flex-col gap-2">
         <div className="flex justify-around sm:gap-5 sm:justify-start w-[100%] items-center border-b-2 border-solid border-[#dedede] pb-3">
           <img
-            src={likedImage}
-            className="h-24 w-24 hidden xs:block sm:h-28 sm:w-28 md:h-36 md:w-36"
+            src={selectedPlaylist.images[0]?.url}
+            className="h-24 w-24 rounded-2xl ml-2 object-cover hidden xs:block sm:h-28 sm:w-28 md:h-36 md:w-36"
           />
-          <div className="flex flex-col gap-2">
-            <h1 className="text-3xl font-semibold sm:text-6xl md:text-7xl self-center cursor-default">
-              Songs i liked
+          <div className="flex flex-col items-center md:items-start">
+            <h1
+              className="text-3xl text-center md:text-left font-semibold sm:text-6xl md:text-7xl self-center cursor-default
+            md:self-start"
+            >
+              {selectedPlaylist.name}
             </h1>
+            {selectedPlaylist.description && (
+              <p className="text-xl sm:text-1xl font-medium text-gray-400">
+                {selectedPlaylist.description}
+              </p>
+            )}
             <div className="flex gap-1 items-center">
-              <img
-                src={userInfo.image}
-                className="h-8 w-8 md:h-10 md:w-10 rounded-full"
-              />
               <p className="text-xl sm:text-2xl font-semibold hover:underline cursor-pointer">
-                {userInfo.username}
+                {selectedPlaylist.owner.display_name}
               </p>
               <p className="text-xl sm:text-2xl cursor-default">
                 <span className="font-medium">· {selectedPlaylist.tracks?.total}</span>{" "}
@@ -173,12 +195,14 @@ const Playlist = () => {
                 selectedPlaylist.tracks?.offset + selectedPlaylist.tracks?.limit
               )
             }
-            className="text-1xl rounded-2xl bg-blue-400 p-2 my-3 text-blackish font-medium m-auto  hover:bg-blue-300 ease-linear duration-100 active:bg-blue-400"
+            className="text-1xl rounded-2xl bg-blue-400 p-2 mt-3 mb-2 text-blackish font-medium m-auto  hover:bg-blue-300 ease-linear duration-100 active:bg-blue-400"
           >
             NEXT SONGS
           </button>
         )}
       </div>
+
+      {showGoToTop && <GoToTop click={GoToTopHandler} />}
     </section>
   );
 };
