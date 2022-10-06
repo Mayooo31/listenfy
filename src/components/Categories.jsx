@@ -73,7 +73,7 @@ const Categories = () => {
   }, []);
 
   return (
-    <div className="fixed flex flex-col gap-5 top-24 bottom-36 left-0 right-0 m-2 mb-4 rounded-2xl md:left-80 md:ml-4 text-grayish bg-[#222] p-4 overflow-y-auto bb">
+    <section className="fixed flex flex-col gap-5 top-24 bottom-36 left-0 right-0 m-2 mb-4 rounded-2xl md:left-80 md:ml-4 text-grayish bg-[#222] p-4 overflow-y-auto bb">
       <div className="flex flex-col gap-2">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-medium">Categories</h1>
@@ -153,7 +153,7 @@ const Categories = () => {
           - selected categories {categoryName.length} of 5 -
         </h1>
       )}
-    </div>
+    </section>
   );
 };
 

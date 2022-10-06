@@ -14,7 +14,7 @@ const Navbar = ({ openPanel, setOpenPanel }) => {
   }, [showSearchBar]);
 
   return (
-    <div className="flex items-center justify-between border-b-2 border-solid border-[#dedede] h-24 w-full px-3 py-3 sm:justify-around ss:py-6 ">
+    <nav className="flex items-center justify-between border-b-2 border-solid border-[#dedede] h-24 w-full px-3 py-3 sm:justify-around ss:py-6 ">
       <img
         src={icon}
         onClick={() => setOpenPanel(!openPanel)}
@@ -61,7 +61,7 @@ const Navbar = ({ openPanel, setOpenPanel }) => {
           className="w-12 h-12 ss:w-14 ss:h-14 rounded-full cursor-pointer border-4 border-solid border-[#0f4070]"
         />
       </div>
-    </div>
+    </nav>
   );
 };
 

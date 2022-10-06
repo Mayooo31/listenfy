@@ -1,13 +1,14 @@
 import React from "react";
 import { useCtx } from "../context/context";
 
+import planet from "../assets/planet-2.png";
 import { PlayIcon } from "@heroicons/react/24/solid";
 
 const Library = () => {
   const { playlists, myTopSongs, newReleases } = useCtx();
 
   return (
-    <div className="fixed flex flex-col gap-5 top-24 bottom-36 left-0 right-0 m-2 mb-4 rounded-2xl md:left-80 md:ml-4 text-grayish bg-[#222] p-4 overflow-y-auto bb">
+    <section className="fixed flex flex-col gap-5 top-24 bottom-36 left-0 right-0 m-2 mb-4 rounded-2xl md:left-80 md:ml-4 text-grayish bg-[#222] p-4 overflow-y-auto bb">
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-medium">Your playlists</h1>
         <div className="flex gap-5 h-[155px] md:h-[187px] overflow-x-auto bb">
@@ -15,7 +16,7 @@ const Library = () => {
             <div key={playlist.id} className="w-28 md:w-36 cursor-pointer group">
               <div className="relative h-28 md:h-36 w-full">
                 <img
-                  src={playlist.images[0].url}
+                  src={!playlist.images[0]?.url ? planet : playlist.images[0]?.url}
                   className="h-full w-full object-cover rounded-md"
                 />
                 <PlayIcon className="absolute h-10 w-10 right-1 bottom-1 text-white md:hidden md:group-hover:block hover:text-green-500 cursor-default" />
@@ -73,7 +74,7 @@ const Library = () => {
             ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

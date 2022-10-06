@@ -8,7 +8,8 @@ import liked from "../assets/liked.png";
 import categories from "../assets/categories.png";
 
 const Panel = ({ openPanel, setOpenPanel }) => {
-  const { playlists, setSection, section } = useCtx();
+  const { playlists, setSection, section, selectedPlaylistId, setSelectedPlaylistId } =
+    useCtx();
 
   return (
     <div
@@ -36,9 +37,18 @@ const Panel = ({ openPanel, setOpenPanel }) => {
             My library
           </p>
         </span>
-        <span className="flex gap-3 hover:text-[white] cursor-pointer">
+        <span
+          onClick={() => setSection("new playlist")}
+          className="flex gap-3 hover:text-[white] cursor-pointer"
+        >
           <img src={add} className="w-8 h-8" />
-          <p className="text-xl font-medium ease-linear duration-100">New playlist</p>
+          <p
+            className={`${
+              section === "new playlist" && "text-white"
+            } text-xl font-medium ease-linear duration-100`}
+          >
+            New playlist
+          </p>
         </span>
         <span
           onClick={() => setSection("categories")}
@@ -74,8 +84,14 @@ const Panel = ({ openPanel, setOpenPanel }) => {
         <h1 className="text-2xl font-bold my-2">Playlists:</h1>
         {playlists.map(playlist => (
           <p
+            onClick={() => {
+              setSelectedPlaylistId(playlist.id);
+              setSection("playlist");
+            }}
             key={playlist.id}
-            className="text-xl font-medium hover:text-[white] cursor-pointer ease-linear duration-100 text-ellipsis whitespace-nowrap overflow-hidden mb-3"
+            className={`${
+              selectedPlaylistId === playlist.id && section === "playlist" && "text-white"
+            } text-xl font-medium hover:text-[white] cursor-pointer ease-linear duration-100 text-ellipsis whitespace-nowrap overflow-hidden mb-3`}
           >
             {playlist.name}
           </p>

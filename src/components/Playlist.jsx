@@ -7,26 +7,16 @@ import convertTime from "../utils/convertTime";
 import { PlayIcon } from "@heroicons/react/24/solid";
 import likedImage from "../assets/liked.png";
 
-const Liked = () => {
-  const [liked, setLiked] = useState([]);
-  const { userLoggedToken, userInfo } = useCtx();
+const Playlist = () => {
+  const [reRender, setReRender] = useState(true);
+  const [selectedPlaylist, setSelectedPlaylist] = useState([]);
+  const { userLoggedToken, userInfo, selectedPlaylistId } = useCtx();
 
-  const getLikedSongs = async () => {
-    const res = await fetch(`https://api.spotify.com/v1/me/tracks?limit=50&offset=0`, {
-      method: "GET",
-      headers: {
-        Authorization: "Bearer " + userLoggedToken,
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await res.json();
+  console.log(selectedPlaylist);
 
-    setLiked(data);
-  };
-
-  const getNextSongs = async offset => {
+  const getPlaylist = async () => {
     const res = await fetch(
-      `https://api.spotify.com/v1/me/tracks?limit=50&offset=${offset}`,
+      `https://api.spotify.com/v1/playlists/${selectedPlaylistId}`,
       {
         method: "GET",
         headers: {
@@ -37,13 +27,33 @@ const Liked = () => {
     );
     const data = await res.json();
 
-    data.items = [...liked.items, ...data.items];
-    setLiked(data);
+    setSelectedPlaylist(data);
+  };
+
+  const getNextSongs = async offset => {
+    const res = await fetch(
+      `https://api.spotify.com/v1/playlists/${selectedPlaylistId}/tracks?offset=${offset}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + userLoggedToken,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await res.json();
+
+    const newData = selectedPlaylist;
+    newData.tracks.offset = data.offset;
+    newData.tracks.items = [...newData.tracks.items, ...data.items];
+
+    setSelectedPlaylist(newData);
+    setReRender(!reRender);
   };
 
   useEffect(() => {
-    getLikedSongs();
-  }, []);
+    getPlaylist();
+  }, [selectedPlaylistId]);
 
   return (
     <section className="fixed flex flex-col gap-5 top-24 bottom-36 left-0 right-0 m-2 mb-4 rounded-2xl md:left-80 md:ml-4 text-grayish bg-[#222] p-4 overflow-y-auto bb">
@@ -66,7 +76,8 @@ const Liked = () => {
                 {userInfo.username}
               </p>
               <p className="text-xl sm:text-2xl cursor-default">
-                <span className="font-medium">· {liked.total}</span> songs
+                <span className="font-medium">· {selectedPlaylist.tracks?.total}</span>{" "}
+                songs
               </p>
               <PlayIcon className="h-8 w-8 md:h-10 md:w-10 ease-linear duration-100 hover:text-green-500 cursor-pointer ml-3" />
             </div>
@@ -93,8 +104,8 @@ const Liked = () => {
           </div>
 
           {/* mapped every song */}
-          {liked.items &&
-            liked.items.map((song, index) => {
+          {selectedPlaylist.tracks?.items &&
+            selectedPlaylist.tracks?.items.map((song, index) => {
               if (
                 !song?.track?.id ||
                 !song?.track?.album?.images[0]?.url ||
@@ -154,9 +165,14 @@ const Liked = () => {
         </div>
 
         {/* button for loading songs */}
-        {liked.offset + liked.limit < liked.total && (
+        {selectedPlaylist.tracks?.offset + selectedPlaylist.tracks?.limit <
+          selectedPlaylist.tracks?.total && (
           <button
-            onClick={() => getNextSongs(liked.offset + liked.limit)}
+            onClick={() =>
+              getNextSongs(
+                selectedPlaylist.tracks?.offset + selectedPlaylist.tracks?.limit
+              )
+            }
             className="text-1xl rounded-2xl bg-blue-400 p-2 my-3 text-blackish font-medium m-auto  hover:bg-blue-300 ease-linear duration-100 active:bg-blue-400"
           >
             NEXT SONGS
@@ -167,6 +183,4 @@ const Liked = () => {
   );
 };
 
-export default Liked;
-
-// text-ellipsis whitespace-nowrap overflow-hidden
+export default Playlist;
