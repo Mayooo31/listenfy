@@ -1,12 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useCtx } from "../context/context";
 
-import convertDate from "../utils/convertDate";
-import convertTime from "../utils/convertTime";
-
 import { PlayIcon } from "@heroicons/react/24/solid";
 import likedImage from "../assets/liked.png";
+
+import InfoLine from "../components/InfoLine";
+import Song from "./Song";
+import ButtonLoadNextSongs from "./ButtonLoadNextSongs";
 import GoToTop from "./GoToTop";
+
+import wheelHandler from "../utils/wheelHandler";
+import goToTopHandler from "../utils/goToTopHandler";
 
 const Liked = () => {
   const sectionRef = useRef();
@@ -44,22 +48,13 @@ const Liked = () => {
     setLiked(data);
   };
 
-  const wheelHandler = () => {
-    if (sectionRef.current.scrollTop < 700) return setShowGoToTop(false);
-    setShowGoToTop(true);
-  };
-
-  const GoToTopHandler = () => {
-    sectionRef.current.scrollTop = 0;
-  };
-
   useEffect(() => {
     getLikedSongs();
   }, []);
 
   return (
     <section
-      onScroll={wheelHandler}
+      onScroll={() => wheelHandler(sectionRef, setShowGoToTop)}
       ref={sectionRef}
       className="fixed flex flex-col gap-5 top-24 bottom-36 left-0 right-0 m-2 mb-4 rounded-2xl md:left-80 md:ml-4 text-grayish bg-[#222] p-4 scroll-smooth overflow-y-auto bb"
     >
@@ -90,96 +85,20 @@ const Liked = () => {
         </div>
         <div className="flex flex-col gap-2 w-full md:w-[95%] md:m-auto">
           {/* Line with info */}
-          <div className="group flex w-full items-center pb-1 cursor-default hover:bg-[#292929]">
-            <div className="flex items-center gap-2 w-[85%] xs:w-[90%] ss:w-[60%] lg:w-[40%]">
-              <p className="hidden sm:block text-lg font-semibold w-8">#</p>
-              <p className="w-[75%] text-lg font-semibold text-ellipsis whitespace-nowrap overflow-x-hidden">
-                name
-              </p>
-            </div>
-            <div className="hidden text-lg font-semibold lg:block lg:w-[35%] text-ellipsis whitespace-nowrap overflow-hidden">
-              album
-            </div>
-            <div className="hidden text-lg font-semibold ss:block w-[30%] lg:w-[15%]">
-              added at
-            </div>
-            <div className="text-lg font-semibold w-[10%] lg:w-[10%] text-right">
-              time
-            </div>
-          </div>
+          <InfoLine />
 
-          {/* mapped every song */}
-          {liked.items &&
-            liked.items.map((song, index) => {
-              if (
-                !song?.track?.id ||
-                !song?.track?.album?.images[0]?.url ||
-                !song?.track?.name ||
-                !song?.track?.artists ||
-                !song?.track?.album?.name ||
-                !song?.added_at ||
-                !song?.track?.duration_ms
-              ) {
-                return;
-              }
-              return (
-                <div
-                  key={song.track.id}
-                  className="group flex gap-3 lg:gap-0 w-full items-center cursor-pointer hover:bg-[#292929]"
-                >
-                  <div className="flex items-center gap-2 w-[85%] xs:w-[90%] ss:w-[60%] lg:w-[40%]">
-                    <p className="hidden sm:block text-lg font-semibold w-8">
-                      {index + 1}
-                    </p>
-                    <div className="relative w-10 h-10">
-                      <img
-                        src={song.track.album.images[0].url}
-                        className="w-10 h-10 object-contain rounded-md group-hover:opacity-60 ease-linear duration-100"
-                      />
-                      <PlayIcon className="absolute h-10 w-10 left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] ease-linear duration-100 text-[#e2e2e2] md:hidden md:group-hover:block hover:text-green-500" />
-                    </div>
-                    <div className="flex flex-col w-[75%]">
-                      <p className="text-lg font-semibold text-ellipsis whitespace-nowrap overflow-x-hidden hover:underline">
-                        {song.track.name}
-                      </p>
-                      <span className="flex gap-2">
-                        {song.track.artists.map((artist, index) => (
-                          <p
-                            key={artist.id}
-                            className="font-medium text-ellipsis whitespace-nowrap overflow-x-hidden hover:underline"
-                          >
-                            {artist.name}
-                            {song.track.artists.length !== index + 1 && ","}
-                          </p>
-                        ))}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="hidden font-medium lg:block lg:w-[35%] text-ellipsis whitespace-nowrap overflow-hidden hover:underline lg:pr-4">
-                    {song.track.album.name}
-                  </div>
-                  <div className="hidden font-medium ss:block w-[30%] lg:w-[15%]">
-                    {convertDate(song.added_at)}
-                  </div>
-                  <div className="font-medium w-[10%] lg:w-[10%] text-right">
-                    {convertTime(song.track.duration_ms)}
-                  </div>
-                </div>
-              );
-            })}
+          {/* .map() every song */}
+          {liked.items && <Song data={liked.items} />}
         </div>
 
-        {/* button for loading songs */}
+        {/* button for loading more songs */}
         {liked.offset + liked.limit < liked.total && (
-          <button
-            onClick={() => getNextSongs(liked.offset + liked.limit)}
-            className="text-1xl rounded-2xl bg-blue-400 p-2 my-3 text-blackish font-medium m-auto  hover:bg-blue-300 ease-linear duration-100 active:bg-blue-400"
-          >
-            NEXT SONGS
-          </button>
+          <ButtonLoadNextSongs click={getNextSongs} data={liked} />
         )}
       </div>
-      {showGoToTop && <GoToTop click={GoToTopHandler} />}
+
+      {/* button for going back to top */}
+      {showGoToTop && <GoToTop click={() => goToTopHandler(sectionRef)} />}
     </section>
   );
 };

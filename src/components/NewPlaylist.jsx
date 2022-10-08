@@ -33,26 +33,6 @@ const NewPlaylist = () => {
     setSection("playlist");
   };
 
-  // const gang = async e => {
-  //   e.preventDefault();
-
-  //   const res = await fetch(
-  //     `https://api.spotify.com/v1/playlists/083hb41x1MEmHo2OZTxXAV/images`,
-  //     {
-  //       method: "PUT",
-  //       headers: {
-  //         Authorization: "Bearer " + userLoggedToken,
-  //         "Content-Type": "image/jpeg",
-  //       },
-  //       body: "https://i.scdn.co/image/ab6775700000ee8585025180039be9a6d60334ae",
-  //     }
-  //   );
-
-  //   const data = await res.json();
-
-  //   console.log(data);
-  // };
-
   return (
     <section className="fixed flex flex-col gap-5 top-24 bottom-36 left-0 right-0 m-2 mb-4 rounded-2xl md:left-80 md:ml-4 text-grayish bg-[#222] p-4 overflow-y-auto bb">
       <div className="flex flex-col h-full items-center gap-5 w-[100%]">
@@ -91,7 +71,10 @@ const NewPlaylist = () => {
           </div>
           <div className="flex justify-around mt-2">
             <button
-              onClick={() => setIsPublic(true)}
+              onClick={e => {
+                e.preventDefault();
+                setIsPublic(true);
+              }}
               className={`text-2xl rounded-2xl ${
                 isPublic && "bg-green-500 border-green-500"
               } py-1 px-2 border-2 border-solid border-[#dedede] text-secondary font-medium m-auto ease-linear duration-100 md:text-3xl`}
@@ -99,7 +82,10 @@ const NewPlaylist = () => {
               Public
             </button>
             <button
-              onClick={() => setIsPublic(false)}
+              onClick={e => {
+                e.preventDefault();
+                setIsPublic(false);
+              }}
               className={`text-2xl rounded-2xl ${
                 !isPublic && "bg-red-400 border-red-400"
               } py-1 px-2 border-2 border-solid border-[#dedede] text-secondary font-medium m-auto ease-linear duration-100 md:text-3xl`}
@@ -109,7 +95,6 @@ const NewPlaylist = () => {
           </div>
           <button
             onClick={createPlaylist}
-            // onClick={() => setSection("songs i liked")}
             type="submit"
             className="text-2xl rounded-2xl bg-blue-400 p-2 my-5 text-secondary font-medium m-auto  hover:bg-blue-300 ease-linear duration-100 active:bg-blue-400 md:text-3xl"
           >

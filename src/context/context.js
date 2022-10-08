@@ -13,6 +13,7 @@ export const ContextProvider = ({ children }) => {
   const [myTopSongs, setMyTopSongs] = useState({});
   const [newReleases, setNewReleases] = useState([]);
   const [selectedPlaylistId, setSelectedPlaylistId] = useState();
+  const [selectedAlbumId, setSelectedAlbumId] = useState();
 
   const [section, setSection] = useState("library");
 
@@ -35,6 +36,8 @@ export const ContextProvider = ({ children }) => {
         setNewReleases,
         selectedPlaylistId,
         setSelectedPlaylistId,
+        selectedAlbumId,
+        setSelectedAlbumId,
       }}
     >
       {children}

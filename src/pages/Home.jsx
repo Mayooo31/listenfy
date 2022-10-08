@@ -10,6 +10,7 @@ import Categories from "../components/Categories";
 import Liked from "../components/Liked";
 import NewPlaylist from "../components/NewPlaylist";
 import Playlist from "../components/Playlist";
+import Album from "../components/Album";
 
 const Home = ({ openPanel, setOpenPanel }) => {
   const navigate = useNavigate();
@@ -78,6 +79,7 @@ const Home = ({ openPanel, setOpenPanel }) => {
         {section === "songs i liked" && <Liked />}
         {section === "new playlist" && <NewPlaylist />}
         {section === "playlist" && <Playlist />}
+        {section === "album" && <Album />}
         <Player />
       </div>
     </div>
