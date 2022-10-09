@@ -21,6 +21,8 @@ const Mode = () => {
       "ugc-image-upload",
       "playlist-read-collaborative",
       "playlist-read-private",
+      "app-remote-control",
+      "streaming",
     ];
 
     window.location.href = `${process.env.REACT_APP_LOGIN_URL}?client_id=${

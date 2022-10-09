@@ -81,13 +81,10 @@ const Playlist = () => {
           <div className="flex justify-around sm:gap-5 sm:justify-start w-[100%] items-center border-b-2 border-solid border-[#dedede] pb-3">
             <img
               src={selectedPlaylist.images[0]?.url}
-              className="hidden h-36 w-36 rounded-2xl ml-2 object-cover xs:block"
+              className="hidden h-36 w-36 shrink-0 rounded-2xl ml-2 object-cover xs:block"
             />
             <div className="flex flex-col gap-2 items-center md:items-start">
-              <h1
-                className="text-2xl text-center md:text-left font-semibold sm:text-5xl md:text-7xl self-center cursor-default
-            md:self-start"
-              >
+              <h1 className="text-[1.7rem] text-center md:text-left font-semibold sm:text-5xl md:text-7xl self-center cursor-default md:self-start">
                 {selectedPlaylist.name}
               </h1>
               {selectedPlaylist.description && (
