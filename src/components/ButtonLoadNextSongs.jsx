@@ -1,12 +1,13 @@
 import React from "react";
+import styles from "../styles";
 
-const ButtonLoadNextSongs = ({ click, data }) => {
+const ButtonLoadNextSongs = props => {
   return (
     <button
-      onClick={() => click(data.offset + data.limit)}
-      className="text-1xl rounded-2xl bg-blue-400 p-2 my-3 text-blackish font-medium m-auto  hover:bg-blue-300 ease-linear duration-100 active:bg-blue-400"
+      onClick={() => props.click(props.data.offset + props.data.limit)}
+      className={styles.button}
     >
-      NEXT SONGS
+      {props.children}
     </button>
   );
 };

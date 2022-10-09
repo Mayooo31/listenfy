@@ -1,17 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useCtx } from "../context/context";
+import { useCtx } from "../../context/context";
 
 import { PlayIcon } from "@heroicons/react/24/solid";
-import likedImage from "../assets/liked.png";
+import likedImage from "../../assets/liked.png";
 
-import InfoLine from "../components/InfoLine";
-import Song from "./Song";
-import ButtonLoadNextSongs from "./ButtonLoadNextSongs";
-import GoToTop from "./GoToTop";
+import InfoLine from "../InfoLine";
+import Song from "../Song";
+import ButtonLoadNextSongs from "../ButtonLoadNextSongs";
+import GoToTop from "../GoToTop";
 
-import wheelHandler from "../utils/wheelHandler";
-import goToTopHandler from "../utils/goToTopHandler";
-import countTime from "../utils/countTime";
+import wheelHandler from "../../utils/wheelHandler";
+import goToTopHandler from "../../utils/goToTopHandler";
+import countTime from "../../utils/countTime";
+import styles from "../../styles";
 
 const Playlist = () => {
   const sectionRef = useRef();
@@ -69,7 +70,7 @@ const Playlist = () => {
     <section
       onScroll={() => wheelHandler(sectionRef, setShowGoToTop)}
       ref={sectionRef}
-      className="fixed flex flex-col gap-5 top-24 bottom-36 left-0 right-0 m-2 mb-4 rounded-2xl md:left-80 md:ml-4 text-grayish bg-[#222] p-4 scroll-smooth overflow-y-auto bb"
+      className={styles.section}
     >
       {selectedPlaylist.owner.display_name !== "Loading" && (
         <div className="flex flex-col gap-2 items-center">
@@ -118,6 +119,10 @@ const Playlist = () => {
             {/* Line with info */}
             <InfoLine />
 
+            {selectedPlaylist.tracks?.items.length === 0 && (
+              <h1 className="text-3xl mx-auto mt-10">Playlist is empty</h1>
+            )}
+
             {/* .map() every song */}
             {selectedPlaylist.tracks?.items && (
               <Song data={selectedPlaylist.tracks.items} />
@@ -127,7 +132,9 @@ const Playlist = () => {
           {/* button for loading more songs */}
           {selectedPlaylist.tracks?.offset + selectedPlaylist.tracks?.limit <
             selectedPlaylist.tracks?.total && (
-            <ButtonLoadNextSongs click={getNextSongs} data={selectedPlaylist.tracks} />
+            <ButtonLoadNextSongs click={getNextSongs} data={selectedPlaylist.tracks}>
+              NEXT SONGS
+            </ButtonLoadNextSongs>
           )}
         </div>
       )}

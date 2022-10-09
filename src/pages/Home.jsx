@@ -1,27 +1,24 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCtx } from "../context/context";
 
 import Navbar from "../components/Navbar";
 import Panel from "../components/Panel";
-import Library from "../components/Library";
 import Player from "../components/Player";
-import Categories from "../components/Categories";
-import Liked from "../components/Liked";
-import NewPlaylist from "../components/NewPlaylist";
-import Playlist from "../components/Playlist";
-import Album from "../components/Album";
+import Library from "../components/sections/Library";
+import Categories from "../components/sections/Categories";
+import Liked from "../components/sections/Liked";
+import NewPlaylist from "../components/sections/NewPlaylist";
+import Playlist from "../components/sections/Playlist";
+import Album from "../components/sections/Album";
+import Artist from "../components/sections/Artist";
 
 const Home = ({ openPanel, setOpenPanel }) => {
   const navigate = useNavigate();
-  const {
-    setUserLoggedToken,
-    setUserInfo,
-    setPlaylists,
-    setMyTopSongs,
-    setNewReleases,
-    section,
-  } = useCtx();
+  const [playlists, setPlaylists] = useState([]);
+  const [myTopSongs, setMyTopSongs] = useState({});
+  const [newReleases, setNewReleases] = useState([]);
+  const { setUserLoggedToken, setUserInfo, section } = useCtx();
 
   const fetchData = async id => {
     const options = {
@@ -55,7 +52,7 @@ const Home = ({ openPanel, setOpenPanel }) => {
           url: dataUserInfo.external_urls.spotify,
           image: dataUserInfo.images[0].url,
         });
-        setPlaylists(dataPlaylists.items);
+        setPlaylists(dataPlaylists);
         setMyTopSongs(dataTopSongs);
         setNewReleases(dataNewReleases.albums);
       });
@@ -72,14 +69,29 @@ const Home = ({ openPanel, setOpenPanel }) => {
   return (
     <div className="h-screen w-screen">
       <Navbar openPanel={openPanel} setOpenPanel={setOpenPanel} />
-      <Panel openPanel={openPanel} setOpenPanel={setOpenPanel} />
+      <Panel
+        openPanel={openPanel}
+        setOpenPanel={setOpenPanel}
+        playlists={playlists}
+        setPlaylists={setPlaylists}
+      />
       <div className="fixed flex flex-col justify-end top-24 bottom-0 left-0 right-0 m-2 md:left-80 md:ml-4">
-        {section === "library" && <Library />}
+        {section === "library" && (
+          <Library
+            playlists={playlists}
+            setPlaylists={setPlaylists}
+            myTopSongs={myTopSongs}
+            setMyTopSongs={setMyTopSongs}
+            newReleases={newReleases}
+            setNewReleases={setNewReleases}
+          />
+        )}
         {section === "categories" && <Categories />}
         {section === "songs i liked" && <Liked />}
         {section === "new playlist" && <NewPlaylist />}
         {section === "playlist" && <Playlist />}
         {section === "album" && <Album />}
+        {section === "artist" && <Artist />}
         <Player />
       </div>
     </div>

@@ -5,7 +5,7 @@ import icon from "../assets/radio2.png";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/solid";
 
 const Navbar = ({ openPanel, setOpenPanel }) => {
-  const { userInfo } = useCtx();
+  const { userInfo, setSection } = useCtx();
   const [showSearchBar, setShowSearchBar] = useState(false);
   const searchRef = useRef();
 
@@ -20,7 +20,11 @@ const Navbar = ({ openPanel, setOpenPanel }) => {
         onClick={() => setOpenPanel(!openPanel)}
         className="block md:hidden w-14 h-14 ss:w-16 ss:h-16 cursor-pointer"
       />
-      <img src={icon} className="hidden md:block w-16 h-16 cursor-pointer" />
+      <img
+        onClick={() => setSection("library")}
+        src={icon}
+        className="hidden md:block w-16 h-16 cursor-pointer"
+      />
       <div className="flex items-center gap-4 ss:gap-8">
         <div className="relative hidden ss:block">
           <input

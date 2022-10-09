@@ -1,5 +1,6 @@
-import React from "react";
 import { useCtx } from "../context/context";
+
+import ButtonLoadNextSongs from "./ButtonLoadNextSongs";
 
 import icon from "../assets/tape2.png";
 import library from "../assets/library.png";
@@ -7,9 +8,31 @@ import add from "../assets/add.png";
 import liked from "../assets/liked.png";
 import categories from "../assets/categories.png";
 
-const Panel = ({ openPanel, setOpenPanel }) => {
-  const { playlists, setSection, section, selectedPlaylistId, setSelectedPlaylistId } =
-    useCtx();
+const Panel = ({ openPanel, setOpenPanel, playlists, setPlaylists }) => {
+  const {
+    setSection,
+    section,
+    selectedPlaylistId,
+    setSelectedPlaylistId,
+    userLoggedToken,
+  } = useCtx();
+
+  const getNextSongs = async offset => {
+    const res = await fetch(
+      `https://api.spotify.com/v1/me/playlists?limit=50&offset=${offset}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + userLoggedToken,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await res.json();
+
+    data.items = [...playlists.items, ...data.items];
+    setPlaylists(data);
+  };
 
   return (
     <div
@@ -25,7 +48,10 @@ const Panel = ({ openPanel, setOpenPanel }) => {
 
       <div className="flex flex-col gap-2">
         <span
-          onClick={() => setSection("library")}
+          onClick={() => {
+            setSection("library");
+            setOpenPanel(false);
+          }}
           className="flex gap-3 hover:text-[white] cursor-pointer"
         >
           <img src={library} className="w-8 h-8" />
@@ -38,7 +64,10 @@ const Panel = ({ openPanel, setOpenPanel }) => {
           </p>
         </span>
         <span
-          onClick={() => setSection("new playlist")}
+          onClick={() => {
+            setSection("new playlist");
+            setOpenPanel(false);
+          }}
           className="flex gap-3 hover:text-[white] cursor-pointer"
         >
           <img src={add} className="w-8 h-8" />
@@ -51,7 +80,10 @@ const Panel = ({ openPanel, setOpenPanel }) => {
           </p>
         </span>
         <span
-          onClick={() => setSection("categories")}
+          onClick={() => {
+            setSection("categories");
+            setOpenPanel(false);
+          }}
           className="flex gap-3 hover:text-[white] cursor-pointer"
         >
           <img src={categories} className="w-8 h-8" />
@@ -64,7 +96,10 @@ const Panel = ({ openPanel, setOpenPanel }) => {
           </p>
         </span>
         <span
-          onClick={() => setSection("songs i liked")}
+          onClick={() => {
+            setSection("songs i liked");
+            setOpenPanel(false);
+          }}
           className="flex gap-3 hover:text-[white] cursor-pointer"
         >
           <img src={liked} className="w-8 h-8" />
@@ -82,20 +117,33 @@ const Panel = ({ openPanel, setOpenPanel }) => {
 
       <div className="overflow-y-auto sb">
         <h1 className="text-2xl font-bold my-2">Playlists:</h1>
-        {playlists.map(playlist => (
-          <p
-            onClick={() => {
-              setSelectedPlaylistId(playlist.id);
-              setSection("playlist");
-            }}
-            key={playlist.id}
-            className={`${
-              selectedPlaylistId === playlist.id && section === "playlist" && "text-white"
-            } text-xl font-medium hover:text-[white] cursor-pointer ease-linear duration-100 text-ellipsis whitespace-nowrap overflow-hidden mb-3`}
-          >
-            {playlist.name}
-          </p>
-        ))}
+        {playlists.items &&
+          playlists.items.map(playlist => (
+            <p
+              onClick={() => {
+                setSelectedPlaylistId(playlist.id);
+                setSection("playlist");
+                setOpenPanel(false);
+              }}
+              key={playlist.id}
+              className={`${
+                selectedPlaylistId === playlist.id &&
+                section === "playlist" &&
+                "text-white"
+              } text-xl font-medium hover:text-[white] cursor-pointer ease-linear duration-100 text-ellipsis whitespace-nowrap overflow-hidden mb-3`}
+            >
+              {playlist.name}
+            </p>
+          ))}
+
+        {/* button for loading more songs */}
+        <div className="w-full flex items-center">
+          {playlists.offset + playlists.limit < playlists.total && (
+            <ButtonLoadNextSongs click={getNextSongs} data={playlists}>
+              NEXT PLAYLISTS
+            </ButtonLoadNextSongs>
+          )}
+        </div>
       </div>
     </div>
   );

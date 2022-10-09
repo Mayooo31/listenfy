@@ -6,14 +6,11 @@ export const useCtx = () => useContext(Context);
 
 export const ContextProvider = ({ children }) => {
   const [userLoggedToken, setUserLoggedToken] = useState(undefined);
-  const [accessToken, setAccessToken] = useState(undefined);
 
   const [userInfo, setUserInfo] = useState({});
-  const [playlists, setPlaylists] = useState([]);
-  const [myTopSongs, setMyTopSongs] = useState({});
-  const [newReleases, setNewReleases] = useState([]);
   const [selectedPlaylistId, setSelectedPlaylistId] = useState();
   const [selectedAlbumId, setSelectedAlbumId] = useState();
+  const [selectedArtistId, setSelectedArtistId] = useState();
 
   const [section, setSection] = useState("library");
 
@@ -22,22 +19,16 @@ export const ContextProvider = ({ children }) => {
       value={{
         userInfo,
         setUserInfo,
-        accessToken,
-        setAccessToken,
-        playlists,
-        setPlaylists,
         userLoggedToken,
         setUserLoggedToken,
         section,
         setSection,
-        myTopSongs,
-        setMyTopSongs,
-        newReleases,
-        setNewReleases,
         selectedPlaylistId,
         setSelectedPlaylistId,
         selectedAlbumId,
         setSelectedAlbumId,
+        selectedArtistId,
+        setSelectedArtistId,
       }}
     >
       {children}

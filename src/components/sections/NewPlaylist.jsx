@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
-import { useCtx } from "../context/context";
+import { useCtx } from "../../context/context";
+import styles from "../../styles";
 
 const NewPlaylist = () => {
   const [isPublic, setIsPublic] = useState(false);
@@ -34,7 +35,7 @@ const NewPlaylist = () => {
   };
 
   return (
-    <section className="fixed flex flex-col gap-5 top-24 bottom-36 left-0 right-0 m-2 mb-4 rounded-2xl md:left-80 md:ml-4 text-grayish bg-[#222] p-4 overflow-y-auto bb">
+    <section className={styles.section}>
       <div className="flex flex-col h-full items-center gap-5 w-[100%]">
         <h1 className="text-3xl mt-3 font-semibold sm:text-6xl md:text-6xl self-center md:my-5 md:self-start">
           Create new playlist

@@ -7,7 +7,7 @@ import convertTime from "../utils/convertTime";
 import { useCtx } from "../context/context";
 
 const Song = ({ data }) => {
-  const { setSelectedAlbumId, setSection } = useCtx();
+  const { setSection, setSelectedAlbumId, setSelectedArtistId } = useCtx();
 
   return data.map((song, index) => {
     if (
@@ -44,6 +44,10 @@ const Song = ({ data }) => {
                 <p
                   key={artist.id}
                   className="font-medium text-ellipsis whitespace-nowrap overflow-x-hidden hover:underline"
+                  onClick={() => {
+                    setSelectedArtistId(artist.id);
+                    setSection("artist");
+                  }}
                 >
                   {artist.name}
                   {song.track.artists.length !== index + 1 && ","}

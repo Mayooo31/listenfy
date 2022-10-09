@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useCtx } from "../context/context";
+import { useCtx } from "../../context/context";
 
-import Playlists from "./Playlists";
+import CategoriesItem from "../CategoriesItem";
+import CategoryItem from "../CategoryItem";
+
+import styles from "../../styles";
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -73,7 +76,7 @@ const Categories = () => {
   }, []);
 
   return (
-    <section className="fixed flex flex-col gap-5 top-24 bottom-36 left-0 right-0 m-2 mb-4 rounded-2xl md:left-80 md:ml-4 text-grayish bg-[#222] p-4 overflow-y-auto bb">
+    <section className={styles.section}>
       <div className="flex flex-col gap-2">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-medium">Categories</h1>
@@ -92,25 +95,17 @@ const Categories = () => {
         </div>
         <div className="flex justify-start gap-3 flex-wrap max-h-[200px] overflow-auto">
           {categories.map(category => (
-            <button
-              onClick={() => {
-                selectCategory(category.id, category.name);
-              }}
+            <CategoriesItem
               key={category.id}
-              className={`${
-                categoryName.find(
-                  catName => catName.id.toLowerCase() === category.id.toLowerCase()
-                )
-                  ? "bg-[#669fd8] text-white"
-                  : "bg-secondary text-blackish"
-              } text-center flex-1 font-medium p-2 rounded-xl whitespace-nowrap cursor-pointer hover:bg-[#8ab2d7] hover:text-white`}
-            >
-              {category.name}
-            </button>
+              category={category}
+              categoryName={categoryName}
+              selectCategory={selectCategory}
+            />
           ))}
         </div>
       </div>
 
+      {/* if no selected category show this h1 */}
       {selectedCategory.length === 0 && (
         <h1 className="flex justify-center text-center pt-10 text-4xl">
           Select category 👌
@@ -119,14 +114,16 @@ const Categories = () => {
 
       {/* .map() every selected category  */}
       {selectedCategory.map((cat, index) => (
-        <Playlists
+        <CategoryItem
           key={cat.href}
-          data={cat}
+          data={cat.items}
           name={categoryName[index].name}
           artist={false}
+          type="playlist"
         />
       ))}
 
+      {/* Showing number of selected categories */}
       {selectedCategory.length !== 0 && (
         <h1 className="flex justify-center text-center pt-5 pb-10 text-lg ss:text-2xl">
           - selected categories {categoryName.length} of 5 -

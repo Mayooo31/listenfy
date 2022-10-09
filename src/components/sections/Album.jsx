@@ -1,23 +1,24 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useCtx } from "../context/context";
+import { useCtx } from "../../context/context";
 
 import { PlayIcon } from "@heroicons/react/24/solid";
+import styles from "../../styles";
 
-import ButtonLoadNextSongs from "./ButtonLoadNextSongs";
-import GoToTop from "./GoToTop";
+import ButtonLoadNextSongs from "../ButtonLoadNextSongs";
+import GoToTop from "../GoToTop";
 
-import wheelHandler from "../utils/wheelHandler";
-import goToTopHandler from "../utils/goToTopHandler";
-import convertDate from "../utils/convertDate";
-import convertTime from "../utils/convertTime";
-import countTime from "../utils/countTime";
+import wheelHandler from "../../utils/wheelHandler";
+import goToTopHandler from "../../utils/goToTopHandler";
+import convertDate from "../../utils/convertDate";
+import convertTime from "../../utils/convertTime";
+import countTime from "../../utils/countTime";
 
 const Album = () => {
   const sectionRef = useRef();
   const [reRender, setReRender] = useState(true);
   const [showGoToTop, setShowGoToTop] = useState(false);
   const [selectedAlbum, setSelectedAlbum] = useState();
-  const { userLoggedToken, selectedAlbumId } = useCtx();
+  const { userLoggedToken, selectedAlbumId, setSection, setSelectedArtistId } = useCtx();
 
   const getAlbum = async () => {
     const res = await fetch(`https://api.spotify.com/v1/albums/${selectedAlbumId}`, {
@@ -62,7 +63,7 @@ const Album = () => {
     <section
       onScroll={() => wheelHandler(sectionRef, setShowGoToTop)}
       ref={sectionRef}
-      className="fixed flex flex-col gap-5 top-24 bottom-36 left-0 right-0 m-2 mb-4 rounded-2xl md:left-80 md:ml-4 text-grayish bg-[#222] p-4 scroll-smooth overflow-y-auto bb"
+      className={styles.section}
     >
       {selectedAlbum && (
         <div className="flex flex-col gap-2 items-center">
@@ -89,6 +90,10 @@ const Album = () => {
                     <p
                       key={artist.id}
                       className="text-xl sm:text-2xl font-semibold text-ellipsis whitespace-nowrap overflow-x-hidden cursor-pointer hover:underline"
+                      onClick={() => {
+                        setSelectedArtistId(artist.id);
+                        setSection("artist");
+                      }}
                     >
                       {artist.name}
                       {selectedAlbum.artists.length !== index + 1 && ","}
@@ -156,6 +161,10 @@ const Album = () => {
                             <p
                               key={artist.id}
                               className="font-medium text-ellipsis whitespace-nowrap overflow-x-hidden hover:underline"
+                              onClick={() => {
+                                setSelectedArtistId(artist.id);
+                                setSection("artist");
+                              }}
                             >
                               {artist.name}
                               {song.artists.length !== index + 1 && ","}
@@ -175,7 +184,9 @@ const Album = () => {
           {/* button for loading more songs */}
           {selectedAlbum.tracks?.offset + selectedAlbum.tracks?.limit <
             selectedAlbum.tracks?.total && (
-            <ButtonLoadNextSongs click={getNextSongs} data={selectedAlbum.tracks} />
+            <ButtonLoadNextSongs click={getNextSongs} data={selectedAlbum.tracks}>
+              NEXT SONGS
+            </ButtonLoadNextSongs>
           )}
         </div>
       )}
