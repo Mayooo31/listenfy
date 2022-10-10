@@ -8,6 +8,8 @@ export const ContextProvider = ({ children }) => {
   const [userLoggedToken, setUserLoggedToken] = useState(undefined);
 
   const [userInfo, setUserInfo] = useState({});
+  const [searchedValue, setSearchedValue] = useState();
+
   const [selectedPlaylistId, setSelectedPlaylistId] = useState();
   const [selectedAlbumId, setSelectedAlbumId] = useState();
   const [selectedArtistId, setSelectedArtistId] = useState();
@@ -29,6 +31,8 @@ export const ContextProvider = ({ children }) => {
         setSelectedAlbumId,
         selectedArtistId,
         setSelectedArtistId,
+        searchedValue,
+        setSearchedValue,
       }}
     >
       {children}

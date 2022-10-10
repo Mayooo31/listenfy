@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { useCtx } from "../context/context";
 import Slider from "react-input-slider";
 
-import nahoda from "../assets/nahoda.jpg";
+import preview from "../assets/preview.jpg";
 
 import {
   PlayIcon,
@@ -13,17 +14,18 @@ import {
 } from "@heroicons/react/24/solid";
 
 const Player = () => {
-  const [playback, setPlayback] = useState({ x: 0 });
+  const { userLoggedToken } = useCtx();
+  const [playback, setPlayback] = useState({ x: 70 });
   const [playbackVolume, setPlaybackVolume] = useState({ x: 50 });
 
-  console.log(playback);
-  console.log(playbackVolume);
+  // console.log(playback);
+  // console.log(playbackVolume);
 
   return (
-    <section className="relative flex w-full h-36 rounded-2xl text-grayish bg-blackish">
+    <section className="relative flex w-full h-36 rounded-2xl text-grayish bg-blackish shadow-xxx">
       <div className="h-36 w-40 hidden ss:flex justify-center items-center">
         <img
-          src={nahoda}
+          src={preview}
           className="h-[75%] border-[5px] border-solid border-[#669fd8] object-cover rounded-full"
         />
       </div>

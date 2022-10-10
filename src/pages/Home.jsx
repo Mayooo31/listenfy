@@ -12,6 +12,7 @@ import NewPlaylist from "../components/sections/NewPlaylist";
 import Playlist from "../components/sections/Playlist";
 import Album from "../components/sections/Album";
 import Artist from "../components/sections/Artist";
+import Search from "../components/sections/Search";
 
 const Home = ({ openPanel, setOpenPanel }) => {
   const navigate = useNavigate();
@@ -42,10 +43,11 @@ const Home = ({ openPanel, setOpenPanel }) => {
       "https://api.spotify.com/v1/browse/new-releases?limit=50&offset=0",
       options
     );
-    const resPlaybackState = await fetch("https://api.spotify.com/v1/me/player", options);
-    console.log(resPlaybackState);
-    const data = await resPlaybackState.json();
-    console.log(data);
+
+    // Playback needs spotify premium
+    // const resPlaybackState = await fetch("https://api.spotify.com/v1/me/player", options);
+    // const data = await resPlaybackState.json();
+    // console.log(data);
 
     Promise.all([resUserInfo, resPlaylists, resTopSongs, resNewReleases])
       .then(values => Promise.all(values.map(r => r.json())))
@@ -96,6 +98,7 @@ const Home = ({ openPanel, setOpenPanel }) => {
         {section === "playlist" && <Playlist />}
         {section === "album" && <Album />}
         {section === "artist" && <Artist />}
+        {section === "search" && <Search />}
         <Player />
       </div>
     </div>

@@ -41,6 +41,7 @@ const CategoryItem = ({ data, name, artist, type }) => {
                 className="w-28 md:w-36 cursor-pointer group"
                 onClick={() => {
                   if (type === "track") return;
+                  type === "artist" && setSelectedArtistId(category.id);
                   type === "playlist" && setSelectedPlaylistId(category.id);
                   type === "album" && setSelectedAlbumId(category.id);
                   setSection(type);

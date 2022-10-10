@@ -2,19 +2,33 @@ import { useEffect, useRef, useState } from "react";
 import { useCtx } from "../context/context";
 
 import icon from "../assets/radio2.png";
-import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import {
+  MagnifyingGlassIcon,
+  XMarkIcon,
+  UserIcon,
+  UserCircleIcon,
+  ArrowUturnLeftIcon,
+} from "@heroicons/react/24/solid";
 
 const Navbar = ({ openPanel, setOpenPanel }) => {
-  const { userInfo, setSection } = useCtx();
+  const { userInfo, section, setSection, setSearchedValue } = useCtx();
   const [showSearchBar, setShowSearchBar] = useState(false);
   const searchRef = useRef();
+
+  const searchHandler = () => {
+    const val = searchRef.current.value.trim();
+    if (val === "") return setSection("library");
+
+    setSearchedValue(val);
+    setSection("search");
+  };
 
   useEffect(() => {
     if (showSearchBar) searchRef.current.focus();
   }, [showSearchBar]);
 
   return (
-    <nav className="flex items-center justify-between border-b-2 border-solid border-[#dedede] h-24 w-full px-3 py-3 sm:justify-around ss:py-6 ">
+    <nav className="flex items-center justify-between bg-[#222] h-24 w-full px-3 py-3 sm:justify-around ss:py-6 ">
       <img
         src={icon}
         onClick={() => setOpenPanel(!openPanel)}
@@ -27,14 +41,24 @@ const Navbar = ({ openPanel, setOpenPanel }) => {
       />
       <div className="flex items-center gap-4 ss:gap-8">
         <div className="relative hidden ss:block">
+          {searchRef.current?.value !== "" && section !== "search" && (
+            <ArrowUturnLeftIcon
+              onClick={() => setSection("search")}
+              className="absolute left-[-50px] top-[50%] translate-y-[-50%] text-secondary w-10 h-10 cursor-pointer"
+            />
+          )}
           <input
+            onChange={searchHandler}
             placeholder="Search..."
             ref={searchRef}
-            className="text-2xl w-[230px] ss:w-[270px] px-3 py-2 pr-10 outline-none rounded-2xl bg-blackish text-secondary font-medium placeholder:text-[#d7d7d7]"
+            className="text-2xl font-semibold w-[230px] ss:w-[270px] px-3 py-2 pr-10 outline-none rounded-2xl text-blackish placeholder:text-gray-400"
           />
           <XMarkIcon
-            onClick={() => (searchRef.current.value = "")}
-            className="absolute top-[50%] translate-y-[-50%] right-0 w-10 h-10 text-secondary cursor-pointer"
+            onClick={() => {
+              searchRef.current.value = "";
+              if (section === "search") setSection("library");
+            }}
+            className="absolute top-[50%] translate-y-[-50%] right-0 w-10 h-10 text-blackish cursor-pointer"
           />
         </div>
         <div className="block ss:hidden">
@@ -42,11 +66,12 @@ const Navbar = ({ openPanel, setOpenPanel }) => {
             onClick={() => {
               setShowSearchBar(true);
             }}
-            className="w-12 h-12 text-blackish"
+            className="w-10 h-10 text-secondary"
           />
           {showSearchBar && (
             <>
               <input
+                onChange={searchHandler}
                 placeholder="Search..."
                 ref={searchRef}
                 className="absolute top-0 left-0 text-4xl w-full h-24 px-3 py-2 outline-none bg-[#202542f4] text-secondary font-medium text-center placeholder:text-[#d7d7d7]"
@@ -60,10 +85,14 @@ const Navbar = ({ openPanel, setOpenPanel }) => {
             </>
           )}
         </div>
-        <img
-          src={userInfo.image}
-          className="w-12 h-12 ss:w-14 ss:h-14 rounded-full cursor-pointer border-4 border-solid border-[#0f4070]"
-        />
+        {userInfo.image ? (
+          <img
+            src={userInfo.image}
+            className="w-12 h-12 ss:w-14 ss:h-14 rounded-full cursor-pointer border-4 border-solid border-blue-400"
+          />
+        ) : (
+          <UserCircleIcon className="w-12 h-12 ss:w-14 ss:h-14 text-secondary" />
+        )}
       </div>
     </nav>
   );
