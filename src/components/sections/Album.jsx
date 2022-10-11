@@ -18,41 +18,54 @@ const Album = () => {
   const [reRender, setReRender] = useState(true);
   const [showGoToTop, setShowGoToTop] = useState(false);
   const [selectedAlbum, setSelectedAlbum] = useState();
-  const { userLoggedToken, selectedAlbumId, setSection, setSelectedArtistId } = useCtx();
+  const { userLoggedToken, selectedAlbumId, setSection, setError, setSelectedArtistId } =
+    useCtx();
 
   const getAlbum = async () => {
-    const res = await fetch(`https://api.spotify.com/v1/albums/${selectedAlbumId}`, {
-      method: "GET",
-      headers: {
-        Authorization: "Bearer " + userLoggedToken,
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await res.json();
-
-    setSelectedAlbum(data);
-    sectionRef.current.scrollTop = 0;
-  };
-
-  const getNextSongs = async offset => {
-    const res = await fetch(
-      `https://api.spotify.com/v1/albums/${selectedAlbumId}/tracks?offset=${offset}`,
-      {
+    try {
+      const res = await fetch(`https://api.spotify.com/v1/albums/${selectedAlbumId}`, {
         method: "GET",
         headers: {
           Authorization: "Bearer " + userLoggedToken,
           "Content-Type": "application/json",
         },
-      }
-    );
-    const data = await res.json();
+      });
+      const data = await res.json();
+      if (data.error) throw data.error;
 
-    const newData = selectedAlbum;
-    newData.tracks.offset = data.offset;
-    newData.tracks.items = [...newData.tracks.items, ...data.items];
+      setSelectedAlbum(data);
+      sectionRef.current.scrollTop = 0;
+    } catch (err) {
+      setError(err);
+      setSection("error");
+    }
+  };
 
-    setSelectedAlbum(newData);
-    setReRender(!reRender);
+  const getNextSongs = async offset => {
+    try {
+      const res = await fetch(
+        `https://api.spotify.com/v1/albums/${selectedAlbumId}/tracks?offset=${offset}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + userLoggedToken,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await res.json();
+      if (data.error) throw data.error;
+
+      const newData = selectedAlbum;
+      newData.tracks.offset = data.offset;
+      newData.tracks.items = [...newData.tracks.items, ...data.items];
+
+      setSelectedAlbum(newData);
+      setReRender(!reRender);
+    } catch (err) {
+      setError(err);
+      setSection("error");
+    }
   };
 
   useEffect(() => {

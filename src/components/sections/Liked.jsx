@@ -17,36 +17,48 @@ const Liked = () => {
   const sectionRef = useRef();
   const [showGoToTop, setShowGoToTop] = useState(false);
   const [liked, setLiked] = useState([]);
-  const { userLoggedToken, userInfo } = useCtx();
+  const { userLoggedToken, userInfo, setError, setSection } = useCtx();
 
   const getLikedSongs = async () => {
-    const res = await fetch(`https://api.spotify.com/v1/me/tracks?limit=50&offset=0`, {
-      method: "GET",
-      headers: {
-        Authorization: "Bearer " + userLoggedToken,
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await res.json();
-
-    setLiked(data);
-  };
-
-  const getNextSongs = async offset => {
-    const res = await fetch(
-      `https://api.spotify.com/v1/me/tracks?limit=50&offset=${offset}`,
-      {
+    try {
+      const res = await fetch(`https://api.spotify.com/v1/me/tracks?limit=50&offset=0`, {
         method: "GET",
         headers: {
           Authorization: "Bearer " + userLoggedToken,
           "Content-Type": "application/json",
         },
-      }
-    );
-    const data = await res.json();
+      });
+      const data = await res.json();
+      if (data.error) throw data.error;
 
-    data.items = [...liked.items, ...data.items];
-    setLiked(data);
+      setLiked(data);
+    } catch (err) {
+      setError(err);
+      setSection("error");
+    }
+  };
+
+  const getNextSongs = async offset => {
+    try {
+      const res = await fetch(
+        `https://api.spotify.com/v1/me/tracks?limit=50&offset=${offset}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + userLoggedToken,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await res.json();
+      if (data.error) throw data.error;
+
+      data.items = [...liked.items, ...data.items];
+      setLiked(data);
+    } catch (err) {
+      setError(err);
+      setSection("error");
+    }
   };
 
   useEffect(() => {

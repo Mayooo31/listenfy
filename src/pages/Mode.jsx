@@ -1,9 +1,6 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 
 const Mode = () => {
-  const navigate = useNavigate();
-
   const loginHandler = () => {
     const scope = [
       "user-read-email",
@@ -34,12 +31,6 @@ const Mode = () => {
 
   return (
     <div className="h-screen w-screen flex flex-col items-center justify-center text-secondary bg-blackish">
-      <button
-        onClick={() => navigate("/demo")}
-        className="text-xl font-medium py-2 px-4 ss:text-3xl ss:py-4 ss:px-6 bg-[#1864ab] hover:bg-[#1c7ed6] ease-linear duration-200 rounded-2xl"
-      >
-        LOGIN WITH MARIO (DEMO)
-      </button>
       <h1 className="text-lg font-medium mt-6 mb-1">Do you have a spotify account ?</h1>
       <button
         onClick={loginHandler}

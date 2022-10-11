@@ -13,13 +13,14 @@ import Playlist from "../components/sections/Playlist";
 import Album from "../components/sections/Album";
 import Artist from "../components/sections/Artist";
 import Search from "../components/sections/Search";
+import Error from "../components/sections/Error";
 
 const Home = ({ openPanel, setOpenPanel }) => {
   const navigate = useNavigate();
   const [playlists, setPlaylists] = useState([]);
   const [myTopSongs, setMyTopSongs] = useState({});
   const [newReleases, setNewReleases] = useState([]);
-  const { setUserLoggedToken, setUserInfo, section } = useCtx();
+  const { setUserLoggedToken, setUserInfo, section, setSection, setError } = useCtx();
 
   const fetchData = async id => {
     const options = {
@@ -49,19 +50,35 @@ const Home = ({ openPanel, setOpenPanel }) => {
     // const data = await resPlaybackState.json();
     // console.log(data);
 
-    Promise.all([resUserInfo, resPlaylists, resTopSongs, resNewReleases])
-      .then(values => Promise.all(values.map(r => r.json())))
-      .then(([dataUserInfo, dataPlaylists, dataTopSongs, dataNewReleases]) => {
-        setUserInfo({
-          username: dataUserInfo.display_name,
-          id: dataUserInfo.id,
-          url: dataUserInfo.external_urls.spotify,
-          image: dataUserInfo.images[0].url,
-        });
-        setPlaylists(dataPlaylists);
-        setMyTopSongs(dataTopSongs);
-        setNewReleases(dataNewReleases.albums);
+    try {
+      const values = await Promise.all([
+        resUserInfo,
+        resPlaylists,
+        resTopSongs,
+        resNewReleases,
+      ]);
+
+      const data = await Promise.all(values.map(r => r.json()));
+      console.log(data);
+      const [dataUserInfo, dataPlaylists, dataTopSongs, dataNewReleases] = data;
+      if (dataUserInfo.error) throw dataUserInfo.error;
+      if (dataPlaylists.error) throw dataPlaylists.error;
+      if (dataTopSongs.error) throw dataTopSongs.error;
+      if (dataNewReleases.error) throw dataNewReleases.error;
+
+      setUserInfo({
+        username: dataUserInfo.display_name,
+        id: dataUserInfo.id,
+        url: dataUserInfo.external_urls.spotify,
+        image: dataUserInfo.images[0].url,
       });
+      setPlaylists(dataPlaylists);
+      setMyTopSongs(dataTopSongs);
+      setNewReleases(dataNewReleases.albums);
+    } catch (err) {
+      setError(err);
+      setSection("error");
+    }
   };
 
   useEffect(() => {
@@ -99,6 +116,7 @@ const Home = ({ openPanel, setOpenPanel }) => {
         {section === "album" && <Album />}
         {section === "artist" && <Artist />}
         {section === "search" && <Search />}
+        {section === "error" && <Error />}
         <Player />
       </div>
     </div>

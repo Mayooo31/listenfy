@@ -12,9 +12,10 @@ import CategoryItem from "../CategoryItem";
 
 const Artist = () => {
   const sectionRef = useRef();
-  const { userLoggedToken, selectedArtistId, setSelectedAlbumId, setSection } = useCtx();
   const [showMore, setShowMore] = useState(5);
   const [selectedArtist, setSelectedArtist] = useState(undefined);
+  const { userLoggedToken, selectedArtistId, setSelectedAlbumId, setSection, setError } =
+    useCtx();
 
   const getArtist = async () => {
     const options = {
@@ -38,16 +39,43 @@ const Artist = () => {
       options
     );
 
-    Promise.all([resArtistInfo, resArtistTopSongs, resArtistAlbums])
-      .then(values => Promise.all(values.map(r => r.json())))
-      .then(([dataArtistInfo, dataArtistTopSongs, dataArtistAlbums]) => {
-        setSelectedArtist({
-          artist_info: dataArtistInfo,
-          artist_top_songs: dataArtistTopSongs,
-          artist_albums: dataArtistAlbums,
-        });
+    try {
+      const values = await Promise.all([
+        resArtistInfo,
+        resArtistTopSongs,
+        resArtistAlbums,
+      ]);
+      if (values.ok === false) throw { message: "Something went wrong..." };
+
+      const [dataArtistInfo, dataArtistTopSongs, dataArtistAlbums] = await Promise.all(
+        values.map(r => r.json())
+      );
+
+      if (dataArtistInfo.error) throw dataArtistInfo.error;
+      if (dataArtistTopSongs.error) throw dataArtistTopSongs.error;
+      if (dataArtistAlbums.error) throw dataArtistAlbums.error;
+
+      setSelectedArtist({
+        artist_info: dataArtistInfo,
+        artist_top_songs: dataArtistTopSongs,
+        artist_albums: dataArtistAlbums,
       });
+    } catch (err) {
+      setError(err);
+      setSection("error");
+    }
+
+    // Promise.all([resArtistInfo, resArtistTopSongs, resArtistAlbums])
+    //   .then(values => Promise.all(values.map(r => r.json())))
+    //   .then(([dataArtistInfo, dataArtistTopSongs, dataArtistAlbums]) => {
+    //     setSelectedArtist({
+    //       artist_info: dataArtistInfo,
+    //       artist_top_songs: dataArtistTopSongs,
+    //       artist_albums: dataArtistAlbums,
+    //     });
+    //   });
   };
+  console.log(selectedArtist);
 
   useEffect(() => {
     getArtist();

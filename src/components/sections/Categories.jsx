@@ -10,22 +10,28 @@ const Categories = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [categoryName, setCategoryName] = useState([]);
-  const { userLoggedToken } = useCtx();
+  const { userLoggedToken, setError, setSection } = useCtx();
 
   const fetchCategories = async () => {
-    const res = await fetch(
-      "https://api.spotify.com/v1/browse/categories?limit=50&offset=0",
-      {
-        method: "GET",
-        headers: {
-          Authorization: "Bearer " + userLoggedToken,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const data = await res.json();
+    try {
+      const res = await fetch(
+        "https://api.spotify.com/v1/browse/categories?limit=50&offset=0",
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + userLoggedToken,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await res.json();
+      if (data.error) throw data.error;
 
-    setCategories(data.categories.items);
+      setCategories(data.categories.items);
+    } catch (err) {
+      setError(err);
+      setSection("error");
+    }
   };
 
   const selectCategory = async (id, name) => {
@@ -54,20 +60,26 @@ const Categories = () => {
     categoryName.length !== 0 &&
       setCategoryName(lastState => [{ name, id }, ...lastState]);
 
-    const res = await fetch(
-      `https://api.spotify.com/v1/browse/categories/${id}/playlists?limit=50&offset=0`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: "Bearer " + userLoggedToken,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const data = await res.json();
+    try {
+      const res = await fetch(
+        `https://api.spotify.com/v1/browse/categories/${id}/playlists?limit=50&offset=0`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + userLoggedToken,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await res.json();
+      if (data.error) throw data.error;
 
-    if (selectedCategory.length === 0) return setSelectedCategory([data.playlists]);
-    setSelectedCategory(lastState => [data.playlists, ...lastState]);
+      if (selectedCategory.length === 0) return setSelectedCategory([data.playlists]);
+      setSelectedCategory(lastState => [data.playlists, ...lastState]);
+    } catch (err) {
+      setError(err);
+      setSection("error");
+    }
   };
 
   useEffect(() => {

@@ -22,44 +22,56 @@ const Playlist = () => {
     owner: { display_name: "Loading" },
     images: { 0: { url: likedImage } },
   });
-  const { userLoggedToken, selectedPlaylistId } = useCtx();
+  const { userLoggedToken, selectedPlaylistId, setError, setSection } = useCtx();
 
   const getPlaylist = async () => {
-    const res = await fetch(
-      `https://api.spotify.com/v1/playlists/${selectedPlaylistId}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: "Bearer " + userLoggedToken,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const data = await res.json();
+    try {
+      const res = await fetch(
+        `https://api.spotify.com/v1/playlists/${selectedPlaylistId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + userLoggedToken,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await res.json();
+      if (data.error) throw data.error;
 
-    setSelectedPlaylist(data);
-    sectionRef.current.scrollTop = 0;
+      setSelectedPlaylist(data);
+      sectionRef.current.scrollTop = 0;
+    } catch (err) {
+      setError(err);
+      setSection("error");
+    }
   };
 
   const getNextSongs = async offset => {
-    const res = await fetch(
-      `https://api.spotify.com/v1/playlists/${selectedPlaylistId}/tracks?offset=${offset}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: "Bearer " + userLoggedToken,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const data = await res.json();
+    try {
+      const res = await fetch(
+        `https://api.spotify.com/v1/playlists/${selectedPlaylistId}/tracks?offset=${offset}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + userLoggedToken,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await res.json();
+      if (data.error) throw data.error;
 
-    const newData = selectedPlaylist;
-    newData.tracks.offset = data.offset;
-    newData.tracks.items = [...newData.tracks.items, ...data.items];
+      const newData = selectedPlaylist;
+      newData.tracks.offset = data.offset;
+      newData.tracks.items = [...newData.tracks.items, ...data.items];
 
-    setSelectedPlaylist(newData);
-    setReRender(!reRender);
+      setSelectedPlaylist(newData);
+      setReRender(!reRender);
+    } catch (err) {
+      setError(err);
+      setSection("error");
+    }
   };
 
   useEffect(() => {

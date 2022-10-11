@@ -4,34 +4,44 @@ import styles from "../../styles";
 
 const NewPlaylist = () => {
   const [isPublic, setIsPublic] = useState(false);
-  const [error, setError] = useState(undefined);
+  const [newPlaylistError, setNewPlaylistError] = useState(undefined);
   const newPlaylistRef = useRef();
   const descriptionRef = useRef();
-  const { userLoggedToken, userInfo, setSection, setSelectedPlaylistId } = useCtx();
+  const { userLoggedToken, userInfo, setSection, setError, setSelectedPlaylistId } =
+    useCtx();
 
   const createPlaylist = async e => {
     e.preventDefault();
 
-    if (newPlaylistRef.current.value === "") return setError("Missing playlist name...");
+    if (newPlaylistRef.current.value === "")
+      return setNewPlaylistError("Missing playlist name...");
 
-    const res = await fetch(`https://api.spotify.com/v1/users/${userInfo.id}/playlists`, {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + userLoggedToken,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: newPlaylistRef.current.value.trim(),
-        description: descriptionRef.current.value.trim(),
-        public: isPublic,
-      }),
-    });
+    try {
+      const res = await fetch(
+        `https://api.spotify.com/v1/users/${userInfo.id}/playlists`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + userLoggedToken,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: newPlaylistRef.current.value.trim(),
+            description: descriptionRef.current.value.trim(),
+            public: isPublic,
+          }),
+        }
+      );
 
-    const data = await res.json();
-    // console.log(data);
+      const data = await res.json();
+      if (data.error) throw data.error;
 
-    setSelectedPlaylistId(data.id);
-    setSection("playlist");
+      setSelectedPlaylistId(data.id);
+      setSection("playlist");
+    } catch (err) {
+      setError(err);
+      setSection("error");
+    }
   };
 
   return (
@@ -44,13 +54,13 @@ const NewPlaylist = () => {
         <form className="flex flex-col gap-3 rounded-2xl p-3 xs:w-[400px] md:w-[450px]">
           <div className="flex flex-col">
             <label
-              className={`${error && "text-red-400"} text-lg font-medium pb-1`}
+              className={`${newPlaylistError && "text-red-400"} text-lg font-medium pb-1`}
               htmlFor="name"
             >
-              {error ? error : "Playlist name"}
+              {newPlaylistError ? newPlaylistError : "Playlist name"}
             </label>
             <input
-              onClick={() => setError(undefined)}
+              onClick={() => setNewPlaylistError(undefined)}
               className="text-white border-2 border-solid border-[#dedede] bg-transparent font-semibold w-full self-center outline-none p-2 px-4 rounded-2xl text-2xl md:text-4xl focus:border-blue-400"
               ref={newPlaylistRef}
               type="text"

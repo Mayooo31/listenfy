@@ -15,6 +15,7 @@ export const ContextProvider = ({ children }) => {
   const [selectedArtistId, setSelectedArtistId] = useState();
 
   const [section, setSection] = useState("library");
+  const [error, setError] = useState();
 
   return (
     <Context.Provider
@@ -33,6 +34,8 @@ export const ContextProvider = ({ children }) => {
         setSelectedArtistId,
         searchedValue,
         setSearchedValue,
+        error,
+        setError,
       }}
     >
       {children}

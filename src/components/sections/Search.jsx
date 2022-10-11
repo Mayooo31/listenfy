@@ -6,25 +6,29 @@ import CategoryItem from "../CategoryItem";
 import styles from "../../styles";
 
 const Search = () => {
-  const { userLoggedToken, searchedValue } = useCtx();
+  const { userLoggedToken, searchedValue, setError, setSection } = useCtx();
   const [searchedData, setSearchedData] = useState();
 
   const getPlaylist = async () => {
-    const res = await fetch(
-      `https://api.spotify.com/v1/search?q=${searchedValue}&type=artist,track,album,playlist`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: "Bearer " + userLoggedToken,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const data = await res.json();
+    try {
+      const res = await fetch(
+        `https://api.spotify.com/v1/search?q=${searchedValue}&type=artist,track,album,playlist`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + userLoggedToken,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await res.json();
+      if (data.error) throw data.error;
 
-    console.log(data);
-
-    setSearchedData(data);
+      setSearchedData(data);
+    } catch (err) {
+      setError(err);
+      setSection("error");
+    }
   };
 
   useEffect(() => {
@@ -36,7 +40,7 @@ const Search = () => {
       {/* Artists */}
       {searchedData && (
         <CategoryItem
-          data={searchedData.artists.items}
+          data={searchedData?.artists?.items}
           name="Artists"
           artist={false}
           type="artist"
@@ -46,7 +50,7 @@ const Search = () => {
       {/* Songs */}
       {searchedData && (
         <CategoryItem
-          data={searchedData.tracks.items}
+          data={searchedData?.tracks?.items}
           name="Songs"
           artist={true}
           type="track"
@@ -56,7 +60,7 @@ const Search = () => {
       {/* Albums */}
       {searchedData && (
         <CategoryItem
-          data={searchedData.albums.items}
+          data={searchedData?.albums?.items}
           name="Albums"
           artist={true}
           type="album"
@@ -66,7 +70,7 @@ const Search = () => {
       {/* Playlists */}
       {searchedData && (
         <CategoryItem
-          data={searchedData.playlists.items}
+          data={searchedData?.playlists?.items}
           name="Playlists"
           artist={false}
           type="playlist"

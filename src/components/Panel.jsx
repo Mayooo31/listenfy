@@ -15,23 +15,30 @@ const Panel = ({ openPanel, setOpenPanel, playlists, setPlaylists }) => {
     selectedPlaylistId,
     setSelectedPlaylistId,
     userLoggedToken,
+    setError,
   } = useCtx();
 
   const getNextSongs = async offset => {
-    const res = await fetch(
-      `https://api.spotify.com/v1/me/playlists?limit=50&offset=${offset}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: "Bearer " + userLoggedToken,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const data = await res.json();
+    try {
+      const res = await fetch(
+        `https://api.spotify.com/v1/me/playlists?limit=50&offset=${offset}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + userLoggedToken,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await res.json();
+      if (data.error) throw data.error;
 
-    data.items = [...playlists.items, ...data.items];
-    setPlaylists(data);
+      data.items = [...playlists.items, ...data.items];
+      setPlaylists(data);
+    } catch (err) {
+      setError(err);
+      setSection("error");
+    }
   };
 
   return (
