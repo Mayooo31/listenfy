@@ -64,18 +64,7 @@ const Artist = () => {
       setError(err);
       setSection("error");
     }
-
-    // Promise.all([resArtistInfo, resArtistTopSongs, resArtistAlbums])
-    //   .then(values => Promise.all(values.map(r => r.json())))
-    //   .then(([dataArtistInfo, dataArtistTopSongs, dataArtistAlbums]) => {
-    //     setSelectedArtist({
-    //       artist_info: dataArtistInfo,
-    //       artist_top_songs: dataArtistTopSongs,
-    //       artist_albums: dataArtistAlbums,
-    //     });
-    //   });
   };
-  console.log(selectedArtist);
 
   useEffect(() => {
     getArtist();
@@ -132,7 +121,7 @@ const Artist = () => {
                     albums
                   </p>
                 </div>
-                <PlayIcon className="h-12 w-12 ease-linear duration-100 hover:text-green-500 cursor-pointer ml-3" />
+                <PlayIcon className="h-12 w-12 ease-linear duration-100 hover:text-blue-400 cursor-pointer ml-3" />
               </div>
             </div>
           </div>
@@ -160,7 +149,7 @@ const Artist = () => {
                         src={song.album.images[0].url}
                         className="w-10 h-10 object-contain rounded-md group-hover:opacity-60 ease-linear duration-100"
                       />
-                      <PlayIcon className="absolute h-10 w-10 left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] ease-linear duration-100 text-[#e2e2e2] md:hidden md:group-hover:block hover:text-green-500" />
+                      <PlayIcon className="absolute h-10 w-10 left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] ease-linear duration-100 text-[#e2e2e2] md:hidden md:group-hover:block hover:text-blue-400" />
                     </div>
                     <div className="flex flex-col w-[75%]">
                       <p className="w-fit max-w-[98%] text-lg font-semibold text-ellipsis whitespace-nowrap overflow-x-hidden hover:underline py-[10px]">
@@ -201,12 +190,14 @@ const Artist = () => {
               {showMore === 5 ? "SHOW MORE" : "SHOW LESS"}
             </button>
 
-            <CategoryItem
-              data={selectedArtist.artist_albums.items}
-              name="Albums"
-              artist={false}
-              type="album"
-            />
+            {selectedArtist.artist_albums.items && (
+              <CategoryItem
+                data={selectedArtist.artist_albums.items}
+                name="Albums"
+                artist={false}
+                type="album"
+              />
+            )}
           </div>
         </div>
       )}

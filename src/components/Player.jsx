@@ -34,7 +34,7 @@ const Player = () => {
           <p className="text-2xl font-medium">LAUSSE THE CAT</p>
           <span>-</span>
           <p className="text-2xl font-semibold text-ellipsis whitespace-nowrap overflow-hidden">
-            Fuccboi Lullaby
+            Belle Bouteille
           </p>
         </div>
         <div className="flex gap-10">

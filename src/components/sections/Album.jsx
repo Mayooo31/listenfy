@@ -125,7 +125,7 @@ const Album = () => {
                     {countTime(selectedAlbum.tracks.items)}
                   </p>
                 </div>
-                <PlayIcon className="h-12 w-12 ease-linear duration-100 hover:text-green-500 cursor-pointer ml-3" />
+                <PlayIcon className="h-12 w-12 ease-linear duration-100 hover:text-blue-400 cursor-pointer ml-3" />
               </div>
             </div>
           </div>
@@ -163,7 +163,7 @@ const Album = () => {
                           src={selectedAlbum?.images[0]?.url}
                           className="h-10 w-10 rounded-md object-cover"
                         />
-                        <PlayIcon className="absolute h-10 w-10 left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] ease-linear duration-100 text-[#e2e2e2] md:hidden md:group-hover:block hover:text-green-500" />
+                        <PlayIcon className="absolute h-10 w-10 left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] ease-linear duration-100 text-[#e2e2e2] md:hidden md:group-hover:block hover:text-blue-400" />
                       </div>
                       <div className="flex flex-col w-[75%]">
                         <p className="w-fit max-w-[100%] text-lg font-semibold text-ellipsis whitespace-nowrap overflow-x-hidden hover:underline">

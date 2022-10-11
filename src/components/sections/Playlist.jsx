@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useCtx } from "../../context/context";
 
-import { PlayIcon } from "@heroicons/react/24/solid";
+import { PlayIcon, HeartIcon } from "@heroicons/react/24/solid";
 import likedImage from "../../assets/liked.png";
 
 import InfoLine from "../InfoLine";
@@ -14,7 +14,7 @@ import goToTopHandler from "../../utils/goToTopHandler";
 import countTime from "../../utils/countTime";
 import styles from "../../styles";
 
-const Playlist = () => {
+const Playlist = ({ fetchData }) => {
   const sectionRef = useRef();
   const [reRender, setReRender] = useState(true);
   const [showGoToTop, setShowGoToTop] = useState(false);
@@ -22,24 +22,39 @@ const Playlist = () => {
     owner: { display_name: "Loading" },
     images: { 0: { url: likedImage } },
   });
-  const { userLoggedToken, selectedPlaylistId, setError, setSection } = useCtx();
+  const { userLoggedToken, selectedPlaylistId, setError, setSection, userInfo } =
+    useCtx();
+
+  // console.log(selectedPlaylist);
+  // console.log(selectedPlaylist.isFollow);
 
   const getPlaylist = async () => {
-    try {
-      const res = await fetch(
-        `https://api.spotify.com/v1/playlists/${selectedPlaylistId}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: "Bearer " + userLoggedToken,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await res.json();
-      if (data.error) throw data.error;
+    const options = {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + userLoggedToken,
+        "Content-Type": "application/json",
+      },
+    };
+    const resPlaylist = await fetch(
+      `https://api.spotify.com/v1/playlists/${selectedPlaylistId}`,
+      options
+    );
+    const resIsFollowPlaylist = await fetch(
+      `https://api.spotify.com/v1/playlists/${selectedPlaylistId}/followers/contains?ids=mayooo31`,
+      options
+    );
 
-      setSelectedPlaylist(data);
+    try {
+      const values = await Promise.all([resPlaylist, resIsFollowPlaylist]);
+
+      const data = await Promise.all(values.map(r => r.json()));
+
+      const [dataPlaylist, dataIsFollowPlaylist] = data;
+      if (dataPlaylist.error) throw dataPlaylist.error;
+      if (dataIsFollowPlaylist.error) throw dataIsFollowPlaylist.error;
+
+      setSelectedPlaylist({ ...dataPlaylist, isFollow: dataIsFollowPlaylist[0] });
       sectionRef.current.scrollTop = 0;
     } catch (err) {
       setError(err);
@@ -68,6 +83,27 @@ const Playlist = () => {
 
       setSelectedPlaylist(newData);
       setReRender(!reRender);
+    } catch (err) {
+      setError(err);
+      setSection("error");
+    }
+  };
+
+  const likeThisPlaylist = async () => {
+    try {
+      const res = await fetch(
+        `https://api.spotify.com/v1/playlists/${selectedPlaylistId}/followers`,
+        {
+          method: selectedPlaylist.isFollow ? "DELETE" : "PUT",
+          headers: {
+            Authorization: "Bearer " + userLoggedToken,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!res.ok) throw "Something went wrong...";
+      fetchData(userLoggedToken);
+      getPlaylist();
     } catch (err) {
       setError(err);
       setSection("error");
@@ -120,7 +156,17 @@ const Playlist = () => {
                     {countTime(selectedPlaylist.tracks.items)}
                   </p>
                 </div>
-                <PlayIcon className="h-12 w-12 ease-linear duration-100 hover:text-green-500 cursor-pointer ml-3" />
+                <div className="flex gap-2">
+                  <PlayIcon className="h-12 w-12 ease-linear duration-100 hover:text-blue-400 cursor-pointer ml-3" />
+                  {userInfo.id !== selectedPlaylist.owner.id && (
+                    <HeartIcon
+                      onClick={() => likeThisPlaylist()}
+                      className={`${
+                        selectedPlaylist.isFollow && "text-blue-500"
+                      } h-12 w-12 ease-linear duration-100 hover:text-blue-400 cursor-pointer ml-3`}
+                    />
+                  )}
+                </div>
               </div>
             </div>
           </div>

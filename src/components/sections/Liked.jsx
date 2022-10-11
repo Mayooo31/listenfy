@@ -93,7 +93,7 @@ const Liked = () => {
                 <p className="text-xl sm:text-2xl cursor-default">
                   <span className="font-medium">· {liked.total}</span> songs
                 </p>
-                <PlayIcon className="h-8 w-8 md:h-10 md:w-10 ease-linear duration-100 hover:text-green-500 cursor-pointer ml-3" />
+                <PlayIcon className="h-8 w-8 md:h-10 md:w-10 ease-linear duration-100 hover:text-blue-400 cursor-pointer ml-3" />
               </div>
             </div>
           </div>

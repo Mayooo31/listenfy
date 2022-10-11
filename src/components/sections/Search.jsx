@@ -38,7 +38,7 @@ const Search = () => {
   return (
     <div className={styles.section}>
       {/* Artists */}
-      {searchedData && (
+      {searchedData?.artists?.items && (
         <CategoryItem
           data={searchedData?.artists?.items}
           name="Artists"
@@ -48,7 +48,7 @@ const Search = () => {
       )}
 
       {/* Songs */}
-      {searchedData && (
+      {searchedData?.tracks?.items && (
         <CategoryItem
           data={searchedData?.tracks?.items}
           name="Songs"
@@ -58,7 +58,7 @@ const Search = () => {
       )}
 
       {/* Albums */}
-      {searchedData && (
+      {searchedData?.albums?.items && (
         <CategoryItem
           data={searchedData?.albums?.items}
           name="Albums"
@@ -68,7 +68,7 @@ const Search = () => {
       )}
 
       {/* Playlists */}
-      {searchedData && (
+      {searchedData?.playlists?.items && (
         <CategoryItem
           data={searchedData?.playlists?.items}
           name="Playlists"

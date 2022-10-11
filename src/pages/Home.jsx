@@ -45,11 +45,6 @@ const Home = ({ openPanel, setOpenPanel }) => {
       options
     );
 
-    // Playback needs spotify premium
-    // const resPlaybackState = await fetch("https://api.spotify.com/v1/me/player", options);
-    // const data = await resPlaybackState.json();
-    // console.log(data);
-
     try {
       const values = await Promise.all([
         resUserInfo,
@@ -59,7 +54,7 @@ const Home = ({ openPanel, setOpenPanel }) => {
       ]);
 
       const data = await Promise.all(values.map(r => r.json()));
-      console.log(data);
+
       const [dataUserInfo, dataPlaylists, dataTopSongs, dataNewReleases] = data;
       if (dataUserInfo.error) throw dataUserInfo.error;
       if (dataPlaylists.error) throw dataPlaylists.error;
@@ -112,7 +107,7 @@ const Home = ({ openPanel, setOpenPanel }) => {
         {section === "categories" && <Categories />}
         {section === "songs i liked" && <Liked />}
         {section === "new playlist" && <NewPlaylist />}
-        {section === "playlist" && <Playlist />}
+        {section === "playlist" && <Playlist fetchData={fetchData} />}
         {section === "album" && <Album />}
         {section === "artist" && <Artist />}
         {section === "search" && <Search />}

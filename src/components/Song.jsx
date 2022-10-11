@@ -33,7 +33,7 @@ const Song = ({ data }) => {
               src={song.track.album.images[0].url}
               className="w-10 h-10 object-contain rounded-md group-hover:opacity-60 ease-linear duration-100"
             />
-            <PlayIcon className="absolute h-10 w-10 left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] ease-linear duration-100 text-[#e2e2e2] md:hidden md:group-hover:block hover:text-green-500" />
+            <PlayIcon className="absolute h-10 w-10 left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] ease-linear duration-100 text-[#e2e2e2] md:hidden md:group-hover:block hover:text-blue-400" />
           </div>
           <div className="flex flex-col w-[75%]">
             <p className="w-fit max-w-[98%] text-lg font-semibold text-ellipsis whitespace-nowrap overflow-x-hidden hover:underline">
