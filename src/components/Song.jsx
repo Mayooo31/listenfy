@@ -26,7 +26,7 @@ const Song = ({ data }) => {
         key={song.track.id + index}
         className="group flex gap-3 lg:gap-0 w-full items-center cursor-pointer hover:bg-[#292929]"
       >
-        <div className="flex items-center gap-2 w-[85%] xs:w-[90%] ss:w-[60%] lg:w-[40%]">
+        <div className="flex items-center gap-2 w-[85%] xs:w-[90%] ss:w-[60%] lg:w-[40%] overflow-x-hidden">
           <p className="hidden sm:block text-lg font-semibold w-8">{index + 1}</p>
           <div className="relative w-10 h-10">
             <img
@@ -35,15 +35,15 @@ const Song = ({ data }) => {
             />
             <PlayIcon className="absolute h-10 w-10 left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] ease-linear duration-100 text-[#e2e2e2] md:hidden md:group-hover:block hover:text-blue-400" />
           </div>
-          <div className="flex flex-col w-[75%]">
-            <p className="w-fit max-w-[98%] text-lg font-semibold text-ellipsis whitespace-nowrap overflow-x-hidden hover:underline">
+          <div className="flex flex-col w-[80%] ss:w-[75%]">
+            <p className="w-fit max-w-[98%] text-base ss:text-lg font-semibold text-ellipsis whitespace-nowrap overflow-x-hidden hover:underline">
               {song.track.name}
             </p>
             <span className="flex gap-1">
               {song.track.artists.map((artist, index) => (
                 <p
                   key={artist.id}
-                  className="font-medium text-ellipsis whitespace-nowrap overflow-x-hidden hover:underline"
+                  className="font-medium text-sm text-ellipsis whitespace-nowrap overflow-x-hidden hover:underline"
                   onClick={() => {
                     setSelectedArtistId(artist.id);
                     setSection("artist");
@@ -72,7 +72,7 @@ const Song = ({ data }) => {
         <div className="hidden font-medium ss:block w-[30%] lg:w-[15%]">
           {convertDate(song.added_at)}
         </div>
-        <div className="font-medium w-[10%] lg:w-[10%] text-right">
+        <div className="font-medium w-[10%] text-right">
           {convertTime(song.track.duration_ms)}
         </div>
       </div>

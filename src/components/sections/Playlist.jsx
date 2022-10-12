@@ -1,18 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useCtx } from "../../context/context";
+import { Helmet } from "react-helmet";
 
 import { PlayIcon, HeartIcon } from "@heroicons/react/24/solid";
 import likedImage from "../../assets/liked.png";
+import musicImage from "../../assets/music.png";
+import styles from "../../styles";
 
 import InfoLine from "../InfoLine";
 import Song from "../Song";
 import ButtonLoadNextSongs from "../ButtonLoadNextSongs";
 import GoToTop from "../GoToTop";
-
 import wheelHandler from "../../utils/wheelHandler";
 import goToTopHandler from "../../utils/goToTopHandler";
 import countTime from "../../utils/countTime";
-import styles from "../../styles";
 
 const Playlist = ({ fetchData }) => {
   const sectionRef = useRef();
@@ -25,17 +26,15 @@ const Playlist = ({ fetchData }) => {
   const { userLoggedToken, selectedPlaylistId, setError, setSection, userInfo } =
     useCtx();
 
-  // console.log(selectedPlaylist);
-  // console.log(selectedPlaylist.isFollow);
+  const options = {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + userLoggedToken,
+      "Content-Type": "application/json",
+    },
+  };
 
   const getPlaylist = async () => {
-    const options = {
-      method: "GET",
-      headers: {
-        Authorization: "Bearer " + userLoggedToken,
-        "Content-Type": "application/json",
-      },
-    };
     const resPlaylist = await fetch(
       `https://api.spotify.com/v1/playlists/${selectedPlaylistId}`,
       options
@@ -47,10 +46,10 @@ const Playlist = ({ fetchData }) => {
 
     try {
       const values = await Promise.all([resPlaylist, resIsFollowPlaylist]);
+      const [dataPlaylist, dataIsFollowPlaylist] = await Promise.all(
+        values.map(r => r.json())
+      );
 
-      const data = await Promise.all(values.map(r => r.json()));
-
-      const [dataPlaylist, dataIsFollowPlaylist] = data;
       if (dataPlaylist.error) throw dataPlaylist.error;
       if (dataIsFollowPlaylist.error) throw dataIsFollowPlaylist.error;
 
@@ -66,13 +65,7 @@ const Playlist = ({ fetchData }) => {
     try {
       const res = await fetch(
         `https://api.spotify.com/v1/playlists/${selectedPlaylistId}/tracks?offset=${offset}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: "Bearer " + userLoggedToken,
-            "Content-Type": "application/json",
-          },
-        }
+        options
       );
       const data = await res.json();
       if (data.error) throw data.error;
@@ -122,15 +115,35 @@ const Playlist = ({ fetchData }) => {
     >
       {selectedPlaylist.owner.display_name !== "Loading" && (
         <div className="flex flex-col gap-2 items-center">
+          <Helmet>
+            <title>Listenfy - {selectedPlaylist.name}</title>
+          </Helmet>
           <img
-            src={selectedPlaylist.images[0]?.url}
+            src={
+              selectedPlaylist.images[0]?.url
+                ? selectedPlaylist.images[0]?.url
+                : musicImage
+            }
             className="xs:hidden h-32 w-32 rounded-2xl ml-2 object-cover"
           />
-          <div className="flex justify-around sm:gap-5 sm:justify-start w-[100%] items-center border-b-2 border-solid border-[#dedede] pb-3">
+          <div className="relative flex justify-around sm:gap-5 sm:justify-start w-[100%] items-center border-b-2 border-solid border-[#dedede] pb-3">
             <img
-              src={selectedPlaylist.images[0]?.url}
-              className="hidden h-36 w-36 shrink-0 rounded-2xl ml-2 object-cover xs:block"
+              src={
+                selectedPlaylist.images[0]?.url
+                  ? selectedPlaylist.images[0]?.url
+                  : musicImage
+              }
+              className="absolute z-[-1] top-[50%] xs:left-[0%] left-[50%] translate-y-[-50%] translate-x-[-50%] w-[50%] h-full rounded-full blur-[350px]"
             />
+            <img
+              src={
+                selectedPlaylist.images[0]?.url
+                  ? selectedPlaylist.images[0]?.url
+                  : musicImage
+              }
+              className="hidden h-36 w-36 z-10 shrink-0 rounded-2xl ml-2 object-cover xs:block"
+            />
+
             <div className="flex flex-col gap-2 items-center md:items-start">
               <h1 className="text-[1.7rem] text-center md:text-left font-semibold sm:text-5xl md:text-7xl self-center cursor-default md:self-start">
                 {selectedPlaylist.name}
@@ -162,7 +175,7 @@ const Playlist = ({ fetchData }) => {
                     <HeartIcon
                       onClick={() => likeThisPlaylist()}
                       className={`${
-                        selectedPlaylist.isFollow && "text-blue-500"
+                        selectedPlaylist.isFollow && "text-blue-400 hover:text-grayish"
                       } h-12 w-12 ease-linear duration-100 hover:text-blue-400 cursor-pointer ml-3`}
                     />
                   )}

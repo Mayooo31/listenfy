@@ -11,6 +11,7 @@ import {
   ForwardIcon,
   BackwardIcon,
   SpeakerWaveIcon,
+  HeartIcon,
 } from "@heroicons/react/24/solid";
 
 const Player = () => {
@@ -23,21 +24,22 @@ const Player = () => {
 
   return (
     <section className="relative flex w-full h-36 rounded-2xl text-grayish bg-blackish shadow-xxx">
-      <div className="h-36 w-40 hidden ss:flex justify-center items-center">
+      <div className="relative h-36 w-40 hidden ss:flex justify-center items-center">
+        <HeartIcon className="absolute z-10 top-[5%] right-[-15px] w-10 h-10 hover:text-[#669fd8] cursor-pointer ease-linear duration-100" />
         <img
           src={preview}
           className="h-[75%] border-[5px] border-solid border-[#669fd8] object-cover rounded-full"
         />
       </div>
       <div className="relative h-full w-full flex flex-col items-center gap-4 justify-end md:w-[calc(90%-160px)]">
-        <div className="absolute px-2 flex gap-2 top-0 left-0 pt-[8px] w-full items-center justify-center whitespace-nowrap">
+        <div className="absolute px-5 flex gap-2 top-0 left-0 pt-[8px] w-full items-center justify-center whitespace-nowrap">
           <p className="text-2xl font-medium">LAUSSE THE CAT</p>
           <span>-</span>
           <p className="text-2xl font-semibold text-ellipsis whitespace-nowrap overflow-hidden">
             Belle Bouteille
           </p>
         </div>
-        <div className="flex gap-10">
+        <div className="flex gap-5 ss:gap-10">
           <BackwardIcon className="w-8 h-8 hover:text-[#669fd8] cursor-pointer ease-linear duration-100" />
 
           <div className="hover:text-[#669fd8] cursor-pointer ease-linear duration-100">
@@ -48,6 +50,7 @@ const Player = () => {
           <ForwardIcon className="w-8 h-8 hover:text-[#669fd8] cursor-pointer ease-linear duration-100" />
         </div>
         <div className="relative flex flex-col gap-2 w-[85%] md:w-[70%] mb-2">
+          <HeartIcon className="absolute ss:hidden top-[-120%] left-[0%] w-10 h-10 hover:text-[#669fd8] cursor-pointer ease-linear duration-100" />
           <Slider
             styles={{
               track: {

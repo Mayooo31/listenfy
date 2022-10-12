@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { useCtx } from "../../context/context";
+import { Helmet } from "react-helmet";
 import styles from "../../styles";
 
 const NewPlaylist = () => {
@@ -46,6 +47,10 @@ const NewPlaylist = () => {
 
   return (
     <section className={styles.section}>
+      <Helmet>
+        <title>Listenfy - New playlist</title>
+      </Helmet>
+
       <div className="flex flex-col h-full items-center gap-5 w-[100%]">
         <h1 className="text-3xl mt-3 font-semibold sm:text-6xl md:text-6xl self-center md:my-5 md:self-start">
           Create new playlist

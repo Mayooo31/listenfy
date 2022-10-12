@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useCtx } from "../../context/context";
+import { Helmet } from "react-helmet";
 
 import { PlayIcon } from "@heroicons/react/24/solid";
 import likedImage from "../../assets/liked.png";
@@ -8,7 +9,6 @@ import InfoLine from "../InfoLine";
 import Song from "../Song";
 import ButtonLoadNextSongs from "../ButtonLoadNextSongs";
 import GoToTop from "../GoToTop";
-
 import wheelHandler from "../../utils/wheelHandler";
 import goToTopHandler from "../../utils/goToTopHandler";
 import styles from "../../styles";
@@ -71,29 +71,42 @@ const Liked = () => {
       ref={sectionRef}
       className={styles.section}
     >
+      <Helmet>
+        <title>Listenfy - Songs i liked</title>
+      </Helmet>
+
       <div className="flex flex-col gap-2">
         {liked.items && (
-          <div className="flex justify-around sm:gap-5 sm:justify-start w-[100%] items-center border-b-2 border-solid border-[#dedede] pb-3">
+          <div className="relative flex justify-around sm:gap-5 sm:justify-start w-[100%] items-center border-b-2 border-solid border-[#dedede] pb-3">
+            <img
+              src={likedImage}
+              className="absolute z-[-1] top-[50%] xs:left-[0%] left-[50%] translate-y-[-50%] translate-x-[-50%] w-[60%] h-full rounded-full blur-[150px]"
+            />
             <img
               src={likedImage}
               className="h-24 w-24 hidden xs:block sm:h-28 sm:w-28 md:h-36 md:w-36"
             />
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col items-center gap-2 xs:items-start">
+              <img
+                src={likedImage}
+                className="h-24 w-24 xs:hidden sm:h-28 sm:w-28 md:h-36 md:w-36"
+              />
               <h1 className="text-3xl font-semibold sm:text-6xl md:text-7xl self-center cursor-default">
                 Songs i liked
               </h1>
-              <div className="flex gap-1 items-center">
-                <img
-                  src={userInfo.image}
-                  className="h-8 w-8 md:h-10 md:w-10 rounded-full"
-                />
-                <p className="text-xl sm:text-2xl font-semibold hover:underline cursor-pointer">
-                  {userInfo.username}
-                </p>
-                <p className="text-xl sm:text-2xl cursor-default">
-                  <span className="font-medium">· {liked.total}</span> songs
-                </p>
-                <PlayIcon className="h-8 w-8 md:h-10 md:w-10 ease-linear duration-100 hover:text-blue-400 cursor-pointer ml-3" />
+              <div className="flex flex-col xs:flex-row gap-1 items-center">
+                <div className="flex items-center gap-2">
+                  <img src={userInfo.image} className="h-10 w-10 rounded-full" />
+                  <p className="text-xl sm:text-2xl font-semibold hover:underline cursor-pointer">
+                    {userInfo.username}
+                  </p>
+                </div>
+                <div className="flex items-center">
+                  <p className="text-xl font-medium sm:text-2xl cursor-default">
+                    <span className="hidden xs:inline-block">·</span> {liked.total} songs
+                  </p>
+                  <PlayIcon className="h-12 w-12 ease-linear duration-100 hover:text-blue-400 cursor-pointer ml-3" />
+                </div>
               </div>
             </div>
           </div>

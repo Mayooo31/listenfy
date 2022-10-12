@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useCtx } from "../../context/context";
+import { Helmet } from "react-helmet";
+
+import styles from "../../styles";
 
 import CategoriesItem from "../CategoriesItem";
 import CategoryItem from "../CategoryItem";
-
-import styles from "../../styles";
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -89,6 +90,10 @@ const Categories = () => {
 
   return (
     <section className={styles.section}>
+      <Helmet>
+        <title>Listenfy - Categories</title>
+      </Helmet>
+
       <div className="flex flex-col gap-2">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-medium">Categories</h1>

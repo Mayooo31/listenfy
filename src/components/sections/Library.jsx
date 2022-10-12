@@ -1,11 +1,17 @@
 import React from "react";
+import { Helmet } from "react-helmet";
+
+import styles from "../../styles";
 
 import CategoryItem from "../CategoryItem";
-import styles from "../../styles";
 
 const Library = ({ playlists, myTopSongs, newReleases }) => {
   return (
     <section className={styles.section}>
+      <Helmet>
+        <title>Listenfy - My library</title>
+      </Helmet>
+
       {/* Your playlists */}
       {playlists?.items && (
         <CategoryItem

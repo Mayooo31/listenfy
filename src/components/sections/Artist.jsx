@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useCtx } from "../../context/context";
+import { Helmet } from "react-helmet";
 
 import { PlayIcon } from "@heroicons/react/24/solid";
+import styles from "../../styles";
 
 import InfoLine from "../InfoLine";
-
-import styles from "../../styles";
 import convertTime from "../../utils/convertTime";
 import convertDate from "../../utils/convertDate";
 import CategoryItem from "../CategoryItem";
@@ -73,6 +73,11 @@ const Artist = () => {
 
   return (
     <section ref={sectionRef} className={styles.section}>
+      {selectedArtist && (
+        <Helmet>
+          <title>Listenfy - Artist - {selectedArtist.artist_info.name}</title>
+        </Helmet>
+      )}
       {selectedArtist && (
         <div className="flex flex-col gap-2 items-center">
           <img

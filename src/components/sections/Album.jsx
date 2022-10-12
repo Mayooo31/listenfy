@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Helmet } from "react-helmet";
 import { useCtx } from "../../context/context";
 
-import { PlayIcon } from "@heroicons/react/24/solid";
+import { HeartIcon, PlayIcon } from "@heroicons/react/24/solid";
 import styles from "../../styles";
 
 import ButtonLoadNextSongs from "../ButtonLoadNextSongs";
 import GoToTop from "../GoToTop";
-
 import wheelHandler from "../../utils/wheelHandler";
 import goToTopHandler from "../../utils/goToTopHandler";
 import convertDate from "../../utils/convertDate";
@@ -21,19 +21,32 @@ const Album = () => {
   const { userLoggedToken, selectedAlbumId, setSection, setError, setSelectedArtistId } =
     useCtx();
 
-  const getAlbum = async () => {
-    try {
-      const res = await fetch(`https://api.spotify.com/v1/albums/${selectedAlbumId}`, {
-        method: "GET",
-        headers: {
-          Authorization: "Bearer " + userLoggedToken,
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await res.json();
-      if (data.error) throw data.error;
+  const options = {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + userLoggedToken,
+      "Content-Type": "application/json",
+    },
+  };
 
-      setSelectedAlbum(data);
+  const getAlbum = async () => {
+    const resAlbum = await fetch(
+      `https://api.spotify.com/v1/albums/${selectedAlbumId}`,
+      options
+    );
+    const resIsFollowAlbum = await fetch(
+      `https://api.spotify.com/v1/me/albums/contains?ids=${selectedAlbumId}`,
+      options
+    );
+
+    try {
+      const values = await Promise.all([resAlbum, resIsFollowAlbum]);
+      const [dataAlbum, dataIsFollowAlbum] = await Promise.all(values.map(r => r.json()));
+
+      if (dataAlbum.error) throw dataAlbum.error;
+      if (dataIsFollowAlbum.error) throw dataIsFollowAlbum.error;
+
+      setSelectedAlbum({ ...dataAlbum, isFollow: dataIsFollowAlbum[0] });
       sectionRef.current.scrollTop = 0;
     } catch (err) {
       setError(err);
@@ -68,6 +81,25 @@ const Album = () => {
     }
   };
 
+  console.log(selectedAlbum);
+
+  const likeThisAlbum = async id => {
+    try {
+      const res = await fetch(`https://api.spotify.com/v1/me/albums?ids=${id}`, {
+        method: selectedAlbum.isFollow ? "DELETE" : "PUT",
+        headers: {
+          Authorization: "Bearer " + userLoggedToken,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!res.ok) throw "Something went wrong...";
+      getAlbum();
+    } catch (err) {
+      setError(err);
+      setSection("error");
+    }
+  };
+
   useEffect(() => {
     getAlbum();
   }, [selectedAlbumId]);
@@ -78,6 +110,12 @@ const Album = () => {
       ref={sectionRef}
       className={styles.section}
     >
+      {selectedAlbum && (
+        <Helmet>
+          <title>Listenfy - Album - {selectedAlbum.name}</title>
+        </Helmet>
+      )}
+
       {selectedAlbum && (
         <div className="flex flex-col gap-2 items-center">
           <img
@@ -125,7 +163,15 @@ const Album = () => {
                     {countTime(selectedAlbum.tracks.items)}
                   </p>
                 </div>
-                <PlayIcon className="h-12 w-12 ease-linear duration-100 hover:text-blue-400 cursor-pointer ml-3" />
+                <div className="flex gap-2">
+                  <PlayIcon className="h-12 w-12 ease-linear duration-100 hover:text-blue-400 cursor-pointer ml-3" />
+                  <HeartIcon
+                    onClick={() => likeThisAlbum(selectedAlbum.id)}
+                    className={`${
+                      selectedAlbum.isFollow && "text-blue-400 hover:text-grayish"
+                    } h-12 w-12 ease-linear duration-100 hover:text-blue-400 cursor-pointer ml-3`}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -144,54 +190,53 @@ const Album = () => {
             </div>
 
             {/* .map() every song */}
-            {selectedAlbum &&
-              selectedAlbum.tracks.items.map((song, index) => {
-                if (!song?.id || !song?.name || !song?.artists || !song?.duration_ms) {
-                  return;
-                }
-                return (
-                  <div
-                    key={song.id}
-                    className="group flex gap-3 lg:gap-0 w-full md:w-[100%] items-center cursor-pointer hover:bg-[#292929]"
-                  >
-                    <div className="flex items-center gap-2 w-[85%] xs:w-[90%]">
-                      <p className="hidden sm:block text-lg font-semibold w-8">
-                        {index + 1}
-                      </p>
-                      <div className="relative w-10 h-10">
-                        <img
-                          src={selectedAlbum?.images[0]?.url}
-                          className="h-10 w-10 rounded-md object-cover"
-                        />
-                        <PlayIcon className="absolute h-10 w-10 left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] ease-linear duration-100 text-[#e2e2e2] md:hidden md:group-hover:block hover:text-blue-400" />
-                      </div>
-                      <div className="flex flex-col w-[75%]">
-                        <p className="w-fit max-w-[100%] text-lg font-semibold text-ellipsis whitespace-nowrap overflow-x-hidden hover:underline">
-                          {song.name}
-                        </p>
-                        <span className="flex gap-2">
-                          {song.artists.map((artist, index) => (
-                            <p
-                              key={artist.id}
-                              className="font-medium text-ellipsis whitespace-nowrap overflow-x-hidden hover:underline"
-                              onClick={() => {
-                                setSelectedArtistId(artist.id);
-                                setSection("artist");
-                              }}
-                            >
-                              {artist.name}
-                              {song.artists.length !== index + 1 && ","}
-                            </p>
-                          ))}
-                        </span>
-                      </div>
+            {selectedAlbum.tracks.items.map((song, index) => {
+              if (!song?.id || !song?.name || !song?.artists || !song?.duration_ms) {
+                return;
+              }
+              return (
+                <div
+                  key={song.id}
+                  className="group flex gap-3 lg:gap-0 w-full md:w-[100%] items-center cursor-pointer hover:bg-[#292929]"
+                >
+                  <div className="flex items-center gap-2 w-[85%] xs:w-[90%]">
+                    <p className="hidden sm:block text-lg font-semibold w-8">
+                      {index + 1}
+                    </p>
+                    <div className="relative w-10 h-10">
+                      <img
+                        src={selectedAlbum?.images[0]?.url}
+                        className="h-10 w-10 rounded-md object-cover"
+                      />
+                      <PlayIcon className="absolute h-10 w-10 left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] ease-linear duration-100 text-[#e2e2e2] md:hidden md:group-hover:block hover:text-blue-400" />
                     </div>
-                    <div className="font-medium w-[10%] lg:w-[10%] text-right">
-                      {convertTime(song.duration_ms)}
+                    <div className="flex flex-col w-[75%]">
+                      <p className="w-fit max-w-[100%] text-lg font-semibold text-ellipsis whitespace-nowrap overflow-x-hidden hover:underline">
+                        {song.name}
+                      </p>
+                      <span className="flex gap-2">
+                        {song.artists.map((artist, index) => (
+                          <p
+                            key={artist.id}
+                            className="font-medium text-ellipsis whitespace-nowrap overflow-x-hidden hover:underline"
+                            onClick={() => {
+                              setSelectedArtistId(artist.id);
+                              setSection("artist");
+                            }}
+                          >
+                            {artist.name}
+                            {song.artists.length !== index + 1 && ","}
+                          </p>
+                        ))}
+                      </span>
                     </div>
                   </div>
-                );
-              })}
+                  <div className="font-medium w-[10%] lg:w-[10%] text-right">
+                    {convertTime(song.duration_ms)}
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           {/* button for loading more songs */}

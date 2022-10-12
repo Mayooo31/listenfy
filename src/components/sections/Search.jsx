@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useCtx } from "../../context/context";
-
-import CategoryItem from "../CategoryItem";
+import { Helmet } from "react-helmet";
 
 import styles from "../../styles";
+
+import CategoryItem from "../CategoryItem";
 
 const Search = () => {
   const { userLoggedToken, searchedValue, setError, setSection } = useCtx();
@@ -37,6 +38,10 @@ const Search = () => {
 
   return (
     <div className={styles.section}>
+      <Helmet>
+        <title>Listenfy - Searching...🥶</title>
+      </Helmet>
+
       {/* Artists */}
       {searchedData?.artists?.items && (
         <CategoryItem

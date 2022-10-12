@@ -97,11 +97,8 @@ const Home = ({ openPanel, setOpenPanel }) => {
         {section === "library" && (
           <Library
             playlists={playlists}
-            setPlaylists={setPlaylists}
             myTopSongs={myTopSongs}
-            setMyTopSongs={setMyTopSongs}
             newReleases={newReleases}
-            setNewReleases={setNewReleases}
           />
         )}
         {section === "categories" && <Categories />}
