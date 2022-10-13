@@ -2,14 +2,15 @@ import React, { useRef, useState } from "react";
 import { useCtx } from "../../context/context";
 import { Helmet } from "react-helmet";
 import styles from "../../styles";
+import useFetch from "../../hooks/useFetch";
 
 const NewPlaylist = () => {
   const [isPublic, setIsPublic] = useState(false);
   const [newPlaylistError, setNewPlaylistError] = useState(undefined);
   const newPlaylistRef = useRef();
   const descriptionRef = useRef();
-  const { userLoggedToken, userInfo, setSection, setError, setSelectedPlaylistId } =
-    useCtx();
+  const { userInfo, setSection, setSelectedPlaylistId } = useCtx();
+  const { fetchData, loading } = useFetch();
 
   const createPlaylist = async e => {
     e.preventDefault();
@@ -17,32 +18,17 @@ const NewPlaylist = () => {
     if (newPlaylistRef.current.value === "")
       return setNewPlaylistError("Missing playlist name...");
 
-    try {
-      const res = await fetch(
-        `https://api.spotify.com/v1/users/${userInfo.id}/playlists`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: "Bearer " + userLoggedToken,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: newPlaylistRef.current.value.trim(),
-            description: descriptionRef.current.value.trim(),
-            public: isPublic,
-          }),
-        }
-      );
-
-      const data = await res.json();
-      if (data.error) throw data.error;
-
-      setSelectedPlaylistId(data.id);
-      setSection("playlist");
-    } catch (err) {
-      setError(err);
-      setSection("error");
-    }
+    const { data } = await fetchData(
+      `https://api.spotify.com/v1/users/${userInfo.id}/playlists`,
+      "POST",
+      JSON.stringify({
+        name: newPlaylistRef.current.value.trim(),
+        description: descriptionRef.current.value.trim(),
+        public: isPublic,
+      })
+    );
+    setSelectedPlaylistId(data.id);
+    setSection("playlist");
   };
 
   return (

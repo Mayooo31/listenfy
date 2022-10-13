@@ -1,5 +1,8 @@
 import React from "react";
+import styles from "../styles";
 import loginHandler from "../utils/loginHandler";
+
+import spotify from "../assets/spotify.png";
 
 const Mode = () => {
   return (
@@ -7,8 +10,9 @@ const Mode = () => {
       <h1 className="text-lg font-medium mt-6 mb-1">Do you have a spotify account ?</h1>
       <button
         onClick={loginHandler}
-        className="text-xl font-medium py-2 px-4 ss:text-3xl ss:py-4 ss:px-6 bg-[#66a80f] hover:bg-[#82c91e] ease-linear duration-200 rounded-2xl"
+        className={`${styles.button} text-xl py-0 px-2 ss:text-3xl ss:py-4 ss:px-6 ease-linear duration-200 rounded-2xl flex items-center`}
       >
+        <img src={spotify} className="w-20 h-20" />
         LOGIN WITH OWN ACCOUNT
       </button>
     </div>

@@ -14,6 +14,7 @@ import GoToTop from "../GoToTop";
 import wheelHandler from "../../utils/wheelHandler";
 import goToTopHandler from "../../utils/goToTopHandler";
 import countTime from "../../utils/countTime";
+import useFetch from "../../hooks/useFetch";
 
 const Playlist = ({ fetchData }) => {
   const sectionRef = useRef();
@@ -23,8 +24,8 @@ const Playlist = ({ fetchData }) => {
     owner: { display_name: "Loading" },
     images: { 0: { url: likedImage } },
   });
-  const { userLoggedToken, selectedPlaylistId, setError, setSection, userInfo } =
-    useCtx();
+  const { userLoggedToken, selectedPlaylistId, userInfo } = useCtx();
+  const { fetchData: fetchData_, fetchPromiseAllData, loading } = useFetch();
 
   const options = {
     method: "GET",
@@ -40,67 +41,39 @@ const Playlist = ({ fetchData }) => {
       options
     );
     const resIsFollowPlaylist = await fetch(
-      `https://api.spotify.com/v1/playlists/${selectedPlaylistId}/followers/contains?ids=mayooo31`,
+      `https://api.spotify.com/v1/playlists/${selectedPlaylistId}/followers/contains?ids=${userInfo.id}`,
       options
     );
+    const { data } = await fetchPromiseAllData([resPlaylist, resIsFollowPlaylist]);
 
-    try {
-      const values = await Promise.all([resPlaylist, resIsFollowPlaylist]);
-      const [dataPlaylist, dataIsFollowPlaylist] = await Promise.all(
-        values.map(r => r.json())
-      );
-
-      if (dataPlaylist.error) throw dataPlaylist.error;
-      if (dataIsFollowPlaylist.error) throw dataIsFollowPlaylist.error;
-
-      setSelectedPlaylist({ ...dataPlaylist, isFollow: dataIsFollowPlaylist[0] });
-      sectionRef.current.scrollTop = 0;
-    } catch (err) {
-      setError(err);
-      setSection("error");
-    }
+    setSelectedPlaylist({ ...data[0], isFollow: data[1][0] });
+    sectionRef.current.scrollTop = 0;
   };
 
   const getNextSongs = async offset => {
-    try {
-      const res = await fetch(
-        `https://api.spotify.com/v1/playlists/${selectedPlaylistId}/tracks?offset=${offset}`,
-        options
-      );
-      const data = await res.json();
-      if (data.error) throw data.error;
+    const { data } = await fetchData_(
+      `https://api.spotify.com/v1/playlists/${selectedPlaylistId}/tracks?offset=${offset}`,
+      "GET",
+      null,
+      true
+    );
+    const newData = selectedPlaylist;
+    newData.tracks.offset = data.offset;
+    newData.tracks.items = [...newData.tracks.items, ...data.items];
 
-      const newData = selectedPlaylist;
-      newData.tracks.offset = data.offset;
-      newData.tracks.items = [...newData.tracks.items, ...data.items];
-
-      setSelectedPlaylist(newData);
-      setReRender(!reRender);
-    } catch (err) {
-      setError(err);
-      setSection("error");
-    }
+    setSelectedPlaylist(newData);
+    setReRender(!reRender);
   };
 
   const likeThisPlaylist = async () => {
-    try {
-      const res = await fetch(
-        `https://api.spotify.com/v1/playlists/${selectedPlaylistId}/followers`,
-        {
-          method: selectedPlaylist.isFollow ? "DELETE" : "PUT",
-          headers: {
-            Authorization: "Bearer " + userLoggedToken,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (!res.ok) throw "Something went wrong...";
-      fetchData(userLoggedToken);
-      getPlaylist();
-    } catch (err) {
-      setError(err);
-      setSection("error");
-    }
+    await fetchData_(
+      `https://api.spotify.com/v1/playlists/${selectedPlaylistId}/followers`,
+      selectedPlaylist.isFollow ? "DELETE" : "PUT",
+      null,
+      true
+    );
+    fetchData(userLoggedToken);
+    getPlaylist();
   };
 
   useEffect(() => {
@@ -133,7 +106,7 @@ const Playlist = ({ fetchData }) => {
                   ? selectedPlaylist.images[0]?.url
                   : musicImage
               }
-              className="absolute z-[-1] top-[50%] xs:left-[0%] left-[50%] translate-y-[-50%] translate-x-[-50%] w-[50%] h-full rounded-full blur-[350px]"
+              className="absolute z-[-1] top-[10%] xs:left-[0%] left-[50%] translate-y-[-50%] translate-x-[-50%] w-[60%] h-full rounded-full blur-[250px]"
             />
             <img
               src={

@@ -5,31 +5,19 @@ import { Helmet } from "react-helmet";
 import styles from "../../styles";
 
 import CategoryItem from "../CategoryItem";
+import useFetch from "../../hooks/useFetch";
 
 const Search = () => {
-  const { userLoggedToken, searchedValue, setError, setSection } = useCtx();
   const [searchedData, setSearchedData] = useState();
+  const { userLoggedToken, searchedValue } = useCtx();
+  const { fetchData, loading } = useFetch();
 
   const getPlaylist = async () => {
-    try {
-      const res = await fetch(
-        `https://api.spotify.com/v1/search?q=${searchedValue}&type=artist,track,album,playlist`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: "Bearer " + userLoggedToken,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await res.json();
-      if (data.error) throw data.error;
-
-      setSearchedData(data);
-    } catch (err) {
-      setError(err);
-      setSection("error");
-    }
+    const { data } = await fetchData(
+      `https://api.spotify.com/v1/search?q=${searchedValue}&type=artist,track,album,playlist`,
+      "GET"
+    );
+    setSearchedData(data);
   };
 
   useEffect(() => {

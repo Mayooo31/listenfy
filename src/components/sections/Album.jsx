@@ -12,14 +12,15 @@ import goToTopHandler from "../../utils/goToTopHandler";
 import convertDate from "../../utils/convertDate";
 import convertTime from "../../utils/convertTime";
 import countTime from "../../utils/countTime";
+import useFetch from "../../hooks/useFetch";
 
 const Album = () => {
   const sectionRef = useRef();
   const [reRender, setReRender] = useState(true);
   const [showGoToTop, setShowGoToTop] = useState(false);
   const [selectedAlbum, setSelectedAlbum] = useState();
-  const { userLoggedToken, selectedAlbumId, setSection, setError, setSelectedArtistId } =
-    useCtx();
+  const { userLoggedToken, selectedAlbumId, setSection, setSelectedArtistId } = useCtx();
+  const { fetchData, fetchPromiseAllData, loading } = useFetch();
 
   const options = {
     method: "GET",
@@ -38,66 +39,33 @@ const Album = () => {
       `https://api.spotify.com/v1/me/albums/contains?ids=${selectedAlbumId}`,
       options
     );
+    const { data } = await fetchPromiseAllData([resAlbum, resIsFollowAlbum]);
 
-    try {
-      const values = await Promise.all([resAlbum, resIsFollowAlbum]);
-      const [dataAlbum, dataIsFollowAlbum] = await Promise.all(values.map(r => r.json()));
-
-      if (dataAlbum.error) throw dataAlbum.error;
-      if (dataIsFollowAlbum.error) throw dataIsFollowAlbum.error;
-
-      setSelectedAlbum({ ...dataAlbum, isFollow: dataIsFollowAlbum[0] });
-      sectionRef.current.scrollTop = 0;
-    } catch (err) {
-      setError(err);
-      setSection("error");
-    }
+    setSelectedAlbum({ ...data[0], isFollow: data[1][0] });
+    sectionRef.current.scrollTop = 0;
   };
 
   const getNextSongs = async offset => {
-    try {
-      const res = await fetch(
-        `https://api.spotify.com/v1/albums/${selectedAlbumId}/tracks?offset=${offset}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: "Bearer " + userLoggedToken,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await res.json();
-      if (data.error) throw data.error;
+    const { data } = await fetchData(
+      `https://api.spotify.com/v1/albums/${selectedAlbumId}/tracks?offset=${offset}`,
+      "GET"
+    );
+    const newData = selectedAlbum;
+    newData.tracks.offset = data.offset;
+    newData.tracks.items = [...newData.tracks.items, ...data.items];
 
-      const newData = selectedAlbum;
-      newData.tracks.offset = data.offset;
-      newData.tracks.items = [...newData.tracks.items, ...data.items];
-
-      setSelectedAlbum(newData);
-      setReRender(!reRender);
-    } catch (err) {
-      setError(err);
-      setSection("error");
-    }
+    setSelectedAlbum(newData);
+    setReRender(!reRender);
   };
 
-  console.log(selectedAlbum);
-
   const likeThisAlbum = async id => {
-    try {
-      const res = await fetch(`https://api.spotify.com/v1/me/albums?ids=${id}`, {
-        method: selectedAlbum.isFollow ? "DELETE" : "PUT",
-        headers: {
-          Authorization: "Bearer " + userLoggedToken,
-          "Content-Type": "application/json",
-        },
-      });
-      if (!res.ok) throw "Something went wrong...";
-      getAlbum();
-    } catch (err) {
-      setError(err);
-      setSection("error");
-    }
+    await fetchData(
+      `https://api.spotify.com/v1/me/albums?ids=${id}`,
+      selectedAlbum.isFollow ? "DELETE" : "PUT",
+      null,
+      true
+    );
+    getAlbum();
   };
 
   useEffect(() => {

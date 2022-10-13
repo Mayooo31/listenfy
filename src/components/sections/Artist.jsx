@@ -9,23 +9,23 @@ import InfoLine from "../InfoLine";
 import convertTime from "../../utils/convertTime";
 import convertDate from "../../utils/convertDate";
 import CategoryItem from "../CategoryItem";
+import useFetch from "../../hooks/useFetch";
 
 const Artist = () => {
   const sectionRef = useRef();
   const [showMore, setShowMore] = useState(5);
   const [selectedArtist, setSelectedArtist] = useState(undefined);
-  const { userLoggedToken, selectedArtistId, setSelectedAlbumId, setSection, setError } =
-    useCtx();
+  const { userLoggedToken, selectedArtistId, setSelectedAlbumId, setSection } = useCtx();
+  const { fetchPromiseAllData, loading } = useFetch();
 
+  const options = {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + userLoggedToken,
+      "Content-Type": "application/json",
+    },
+  };
   const getArtist = async () => {
-    const options = {
-      method: "GET",
-      headers: {
-        Authorization: "Bearer " + userLoggedToken,
-        "Content-Type": "application/json",
-      },
-    };
-
     const resArtistInfo = await fetch(
       `https://api.spotify.com/v1/artists/${selectedArtistId}`,
       options
@@ -39,31 +39,17 @@ const Artist = () => {
       options
     );
 
-    try {
-      const values = await Promise.all([
-        resArtistInfo,
-        resArtistTopSongs,
-        resArtistAlbums,
-      ]);
-      if (values.ok === false) throw { message: "Something went wrong..." };
+    const { data } = await fetchPromiseAllData(
+      [resArtistInfo, resArtistTopSongs, resArtistAlbums],
+      null,
+      true
+    );
 
-      const [dataArtistInfo, dataArtistTopSongs, dataArtistAlbums] = await Promise.all(
-        values.map(r => r.json())
-      );
-
-      if (dataArtistInfo.error) throw dataArtistInfo.error;
-      if (dataArtistTopSongs.error) throw dataArtistTopSongs.error;
-      if (dataArtistAlbums.error) throw dataArtistAlbums.error;
-
-      setSelectedArtist({
-        artist_info: dataArtistInfo,
-        artist_top_songs: dataArtistTopSongs,
-        artist_albums: dataArtistAlbums,
-      });
-    } catch (err) {
-      setError(err);
-      setSection("error");
-    }
+    setSelectedArtist({
+      artist_info: data[0],
+      artist_top_songs: data[1],
+      artist_albums: data[2],
+    });
   };
 
   useEffect(() => {

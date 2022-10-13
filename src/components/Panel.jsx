@@ -1,4 +1,5 @@
 import { useCtx } from "../context/context";
+import useFetch from "../hooks/useFetch";
 
 import ButtonLoadNextSongs from "./ButtonLoadNextSongs";
 
@@ -9,36 +10,16 @@ import liked from "../assets/liked.png";
 import categories from "../assets/categories.png";
 
 const Panel = ({ openPanel, setOpenPanel, playlists, setPlaylists }) => {
-  const {
-    setSection,
-    section,
-    selectedPlaylistId,
-    setSelectedPlaylistId,
-    userLoggedToken,
-    setError,
-  } = useCtx();
+  const { setSection, section, selectedPlaylistId, setSelectedPlaylistId } = useCtx();
+  const { fetchData, loading } = useFetch();
 
-  const getNextSongs = async offset => {
-    try {
-      const res = await fetch(
-        `https://api.spotify.com/v1/me/playlists?limit=50&offset=${offset}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: "Bearer " + userLoggedToken,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await res.json();
-      if (data.error) throw data.error;
-
-      data.items = [...playlists.items, ...data.items];
-      setPlaylists(data);
-    } catch (err) {
-      setError(err);
-      setSection("error");
-    }
+  const getNextPlaylists = async offset => {
+    const { data } = await fetchData(
+      `https://api.spotify.com/v1/me/playlists?limit=50&offset=${offset}`,
+      "GET"
+    );
+    data.items = [...playlists.items, ...data.items];
+    setPlaylists(data);
   };
 
   return (
@@ -146,7 +127,7 @@ const Panel = ({ openPanel, setOpenPanel, playlists, setPlaylists }) => {
         {/* button for loading more songs */}
         <div className="w-full flex items-center">
           {playlists.offset + playlists.limit < playlists.total && (
-            <ButtonLoadNextSongs click={getNextSongs} data={playlists}>
+            <ButtonLoadNextSongs click={getNextPlaylists} data={playlists}>
               NEXT PLAYLISTS
             </ButtonLoadNextSongs>
           )}

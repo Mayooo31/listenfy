@@ -8,15 +8,12 @@ import styles from "../../styles";
 import loginHandler from "../../utils/loginHandler";
 
 const Error = () => {
-  const navigate = useNavigate();
   const { error } = useCtx();
 
   return (
     <div className={`${styles.section} justify-center items-center gap-5`}>
       <Helmet>
-        <title>
-          Listenfy - Error {error?.status ? error.status : ": Something happend"}
-        </title>
+        <title>Listenfy - Error Something happend</title>
       </Helmet>
       <div className="flex gap-3 text-3xl">
         <h1 className="text-red-500">{error?.status}</h1>

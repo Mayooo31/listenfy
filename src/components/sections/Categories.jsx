@@ -1,38 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { useCtx } from "../../context/context";
 import { Helmet } from "react-helmet";
 
 import styles from "../../styles";
 
 import CategoriesItem from "../CategoriesItem";
 import CategoryItem from "../CategoryItem";
+import useFetch from "../../hooks/useFetch";
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [categoryName, setCategoryName] = useState([]);
-  const { userLoggedToken, setError, setSection } = useCtx();
+  const { fetchData, loading } = useFetch();
 
   const fetchCategories = async () => {
-    try {
-      const res = await fetch(
-        "https://api.spotify.com/v1/browse/categories?limit=50&offset=0",
-        {
-          method: "GET",
-          headers: {
-            Authorization: "Bearer " + userLoggedToken,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await res.json();
-      if (data.error) throw data.error;
-
-      setCategories(data.categories.items);
-    } catch (err) {
-      setError(err);
-      setSection("error");
-    }
+    const { data } = await fetchData(
+      "https://api.spotify.com/v1/browse/categories?limit=50&offset=0",
+      "GET"
+    );
+    setCategories(data.categories.items);
   };
 
   const selectCategory = async (id, name) => {
@@ -61,26 +47,12 @@ const Categories = () => {
     categoryName.length !== 0 &&
       setCategoryName(lastState => [{ name, id }, ...lastState]);
 
-    try {
-      const res = await fetch(
-        `https://api.spotify.com/v1/browse/categories/${id}/playlists?limit=50&offset=0`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: "Bearer " + userLoggedToken,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await res.json();
-      if (data.error) throw data.error;
-
-      if (selectedCategory.length === 0) return setSelectedCategory([data.playlists]);
-      setSelectedCategory(lastState => [data.playlists, ...lastState]);
-    } catch (err) {
-      setError(err);
-      setSection("error");
-    }
+    const { data } = await fetchData(
+      `https://api.spotify.com/v1/browse/categories/${id}/playlists?limit=50&offset=0`,
+      "GET"
+    );
+    if (selectedCategory.length === 0) return setSelectedCategory([data.playlists]);
+    setSelectedCategory(lastState => [data.playlists, ...lastState]);
   };
 
   useEffect(() => {

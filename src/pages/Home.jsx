@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCtx } from "../context/context";
+import useFetch from "../hooks/useFetch";
 
 import Navbar from "../components/Navbar";
 import Panel from "../components/Panel";
@@ -15,12 +16,18 @@ import Artist from "../components/sections/Artist";
 import Search from "../components/sections/Search";
 import Error from "../components/sections/Error";
 
+const apiUserInfo = "https://api.spotify.com/v1/me";
+const apiPlaylists = "https://api.spotify.com/v1/me/playlists?limit=50&offset=0";
+const apiTopSongs = "https://api.spotify.com/v1/me/top/tracks?limit=50&offset=0";
+const apiNewReleases = "https://api.spotify.com/v1/browse/new-releases?limit=50&offset=0";
+
 const Home = ({ openPanel, setOpenPanel }) => {
   const navigate = useNavigate();
   const [playlists, setPlaylists] = useState([]);
   const [myTopSongs, setMyTopSongs] = useState({});
   const [newReleases, setNewReleases] = useState([]);
-  const { setUserLoggedToken, setUserInfo, section, setSection, setError } = useCtx();
+  const { setUserLoggedToken, setUserInfo, section } = useCtx();
+  const { fetchPromiseAllData, loading } = useFetch();
 
   const fetchData = async id => {
     const options = {
@@ -31,49 +38,27 @@ const Home = ({ openPanel, setOpenPanel }) => {
       },
     };
 
-    const resUserInfo = await fetch("https://api.spotify.com/v1/me", options);
-    const resPlaylists = await fetch(
-      "https://api.spotify.com/v1/me/playlists?limit=50&offset=0",
-      options
-    );
-    const resTopSongs = await fetch(
-      "https://api.spotify.com/v1/me/top/tracks?limit=50&offset=0",
-      options
-    );
-    const resNewReleases = await fetch(
-      "https://api.spotify.com/v1/browse/new-releases?limit=50&offset=0",
-      options
-    );
+    const resUserInfo = await fetch(apiUserInfo, options);
+    const resPlaylists = await fetch(apiPlaylists, options);
+    const resTopSongs = await fetch(apiTopSongs, options);
+    const resNewReleases = await fetch(apiNewReleases, options);
 
-    try {
-      const values = await Promise.all([
-        resUserInfo,
-        resPlaylists,
-        resTopSongs,
-        resNewReleases,
-      ]);
+    const { data } = await fetchPromiseAllData([
+      resUserInfo,
+      resPlaylists,
+      resTopSongs,
+      resNewReleases,
+    ]);
 
-      const data = await Promise.all(values.map(r => r.json()));
-
-      const [dataUserInfo, dataPlaylists, dataTopSongs, dataNewReleases] = data;
-      if (dataUserInfo.error) throw dataUserInfo.error;
-      if (dataPlaylists.error) throw dataPlaylists.error;
-      if (dataTopSongs.error) throw dataTopSongs.error;
-      if (dataNewReleases.error) throw dataNewReleases.error;
-
-      setUserInfo({
-        username: dataUserInfo.display_name,
-        id: dataUserInfo.id,
-        url: dataUserInfo.external_urls.spotify,
-        image: dataUserInfo.images[0].url,
-      });
-      setPlaylists(dataPlaylists);
-      setMyTopSongs(dataTopSongs);
-      setNewReleases(dataNewReleases.albums);
-    } catch (err) {
-      setError(err);
-      setSection("error");
-    }
+    setUserInfo({
+      username: data[0].display_name,
+      id: data[0].id,
+      url: data[0].external_urls.spotify,
+      image: data[0].images[0].url,
+    });
+    setPlaylists(data[1]);
+    setMyTopSongs(data[2]);
+    setNewReleases(data[3].albums);
   };
 
   useEffect(() => {
